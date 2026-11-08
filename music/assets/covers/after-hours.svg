@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" role="img" aria-labelledby="title desc">
+  <title id="title">After Hours by Parallel Lines</title>
+  <desc id="desc">Original demo artwork. A graphite typographic grid interrupted by a vivid lime square.</desc>
+  <path fill="#242826" d="M0 0h600v600H0z"/>
+  <g fill="none" stroke="#525750" stroke-width="1"><path d="M30 30h540v540H30zM30 165h540M30 300h540M30 435h540M165 30v540M300 30v540M435 30v540"/></g>
+  <path fill="#c5e855" d="M300 165h270v270H300z"/>
+  <g font-family="Arial,Helvetica,sans-serif" font-weight="700" letter-spacing="-5"><text x="39" y="150" fill="#f0eee6" font-size="107">AFTER</text><text x="38" y="284" fill="#f0eee6" font-size="107">HOURS</text></g>
+  <g fill="#c5e855" font-family="Arial,Helvetica,sans-serif"><text x="42" y="333" font-size="13" letter-spacing="2">PARALLEL LINES</text><text x="42" y="393" font-size="11" letter-spacing="1.6">VOL. 03</text><text x="42" y="555" font-size="10" letter-spacing="1.2">ORIGINAL DEMO / 2026</text></g>
+  <circle cx="435" cy="300" r="74" fill="none" stroke="#242826" stroke-width="2"/><circle cx="435" cy="300" r="9" fill="#242826"/>
+  <g stroke="#242826" stroke-width="1"><path d="M435 204v192M339 300h192"/></g>
+</svg>

@@ -1,0 +1,116 @@
+:root {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+  color: #25252b;
+  background: #262d27;
+  color-scheme: light;
+  --preview-scale: 1.4;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  height: 100vh;
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: #262d27 url("./assets/wallpaper.jpg") center / cover no-repeat;
+}
+button, input, select { font: inherit; }
+button { cursor: pointer; }
+[hidden] { display: none !important; }
+
+.mac-menu-bar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex: 0 0 28px;
+  height: 28px;
+  padding: 0 18px;
+  color: white;
+  background: #151c1638;
+  border-bottom: 1px solid #ffffff12;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  font-size: 12px;
+  text-shadow: 0 1px 3px #0006;
+  user-select: none;
+}
+#menu-clock { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.music-viewport {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  width: calc(100% - clamp(32px, 10vw, 160px));
+  max-width: 1400px;
+  margin: 36px auto 80px;
+  overflow: hidden;
+  border: 1px solid #ffffff66;
+  border-radius: 11px;
+  background: white;
+  box-shadow: 0 22px 65px #0006, 0 2px 8px #0003;
+}
+#player-root { width: 100%; height: 100%; zoom: var(--preview-scale); }
+
+/* Working CD actions belong to the development shell, outside the desktop bar. */
+.disc-controls { position: fixed; z-index: 20; left: 20px; bottom: 18px; }
+.disc-controls summary {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  height: 36px;
+  padding: 0 12px;
+  border: 1px solid #ffffff4d;
+  border-radius: 9px;
+  background: #f4f5f0e8;
+  box-shadow: 0 3px 14px #0003;
+  font-size: 12px;
+  list-style: none;
+  cursor: pointer;
+}
+.disc-controls summary::-webkit-details-marker { display: none; }
+.disc-controls[open] summary, .disc-controls summary:hover { background: white; }
+.disc-controls summary svg { width: 19px; height: 19px; fill: none; stroke: currentColor; stroke-width: 1.5; }
+.disc-panel {
+  position: absolute;
+  left: 0;
+  bottom: 46px;
+  width: 295px;
+  max-width: calc(100vw - 24px);
+  max-height: calc(100dvh - 108px);
+  overflow-y: auto;
+  padding: 18px;
+  border: 1px solid #c7c7cf;
+  border-radius: 10px;
+  background: #f6f6f9;
+  box-shadow: 0 14px 40px #0003;
+}
+.disc-panel h1 { font-size: 15px; margin: 0 0 7px; font-weight: 650; }
+.disc-panel p { font-size: 12px; line-height: 1.5; margin: 0 0 14px; color: #6b6b75; }
+.disc-panel label { display: block; font-size: 11px; font-weight: 600; margin: 0 0 5px; }
+.disc-panel select { width: 100%; height: 30px; border: 1px solid #c7c7ce; border-radius: 5px; background: white; padding: 0 7px; color: inherit; font-size: 12px; }
+.disc-panel-actions { display: flex; gap: 8px; margin: 12px 0; }
+.disc-panel button { border: 1px solid #c9c9d0; background: white; border-radius: 5px; color: inherit; padding: 6px 10px; font-size: 12px; }
+.disc-panel-actions button { flex: 1; }
+.disc-panel button[type="submit"] { background: #e83e59; border-color: #dc3650; color: white; }
+.disc-panel button:disabled { opacity: .4; cursor: default; }
+.disc-panel p.disc-state { color: #40404a; margin: 10px 0; font-size: 11px; }
+.disc-panel .fresh-button { width: 100%; margin: 0 0 12px; }
+.disc-panel p.preview-note { font-size: 10px; color: #83838c; margin: 0 0 12px; }
+.disc-panel a { font-size: 11px; color: #686873; text-decoration: none; }
+.disc-panel a:hover { text-decoration: underline; }
+:focus-visible { outline: 2px solid #e83e59; outline-offset: 2px; }
+
+@media (max-width: 1100px) { :root { --preview-scale: 1.2; } }
+@media (max-width: 800px) {
+  :root { --preview-scale: 1; }
+  .mac-menu-bar { padding: 0 12px; }
+  .music-viewport { width: calc(100% - 24px); margin-top: 24px; }
+  .disc-controls { left: 12px; }
+}
+@media (max-width: 430px) {
+  .music-viewport { width: calc(100% - 16px); margin-top: 16px; }
+}
+@media (max-height: 500px) {
+  .music-viewport { margin-top: 12px; margin-bottom: 64px; }
+  .disc-controls { bottom: 12px; }
+}

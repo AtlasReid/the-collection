@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" role="img" aria-labelledby="title desc">
+  <title id="title">Tidal Room by Coastline Assembly</title>
+  <desc id="desc">Original demo artwork. Ultramarine coastal silhouettes and white tide lines beneath pale sky.</desc>
+  <path fill="#ececdf" d="M0 0h600v600H0z"/>
+  <path fill="#274c9b" d="M0 185c79-47 127-32 193-1s130 43 207 4 135-50 200-30v442H0z"/>
+  <path fill="#14366b" d="M0 326c85-51 161-64 242-30s138 35 217-1 117-26 141-16v321H0z"/>
+  <g fill="none" stroke="#e4e8d9" stroke-width="2"><path d="M-20 231c86-53 141-38 213-7s130 43 207 4 135-50 220-24"/><path d="M-20 243c86-53 141-38 213-7s130 43 207 4 135-50 220-24"/><path d="M-20 255c86-53 141-38 213-7s130 43 207 4 135-50 220-24"/></g>
+  <circle fill="#e2b967" cx="497" cy="96" r="22"/>
+  <g font-family="Arial,Helvetica,sans-serif"><text x="32" y="48" fill="#14366b" font-size="13" letter-spacing="2.8">COASTLINE ASSEMBLY</text><text x="29" y="120" fill="#14366b" font-size="60" letter-spacing="-3">Tidal Room</text><text x="32" y="555" fill="#ececdf" font-size="12" letter-spacing="2.4">AN EXERCISE IN COMING HOME</text><text x="32" y="577" fill="#ececdf" font-size="9" letter-spacing="1.6">ORIGINAL DEMO / COMPACT DISC / 2026</text></g>
+</svg>

@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <meta name="description" content="A standalone development view of The Collection's virtual Music application.">
+  <title>Music · The Collection development</title>
+  <link rel="icon" href="../../music/assets/disc.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="../../music/player.css">
+  <link rel="stylesheet" href="./preview.css">
+  <script type="module" src="./preview.js"></script>
+</head>
+<body>
+  <header class="mac-menu-bar" aria-label="Virtual desktop menu bar">
+    <time id="menu-clock"></time>
+  </header>
+  <main class="music-viewport" aria-label="Virtual Music window">
+    <div id="player-root"></div>
+  </main>
+  <details class="disc-controls" id="disc-controls">
+        <summary aria-label="Development CD controls" title="Development CD controls">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="2.5"/></svg><span>CD preview</span>
+        </summary>
+        <form id="disc-form" class="disc-panel">
+          <h1>CD preview</h1>
+          <p>Insert an example album to try artwork, import and playback.</p>
+          <label for="preview-album">Album</label>
+          <select id="preview-album" name="album"></select>
+          <div class="disc-panel-actions"><button type="button" id="preview-eject">Eject</button><button type="submit">Insert CD</button></div>
+          <p class="disc-state" id="disc-state" role="status" aria-live="polite"></p>
+          <button type="button" id="preview-fresh" class="fresh-button">Start a fresh preview</button>
+          <p class="preview-note">Preview library only. Imports save track entries, not audio. The shared real-album collection uses SoundCloud or Bandcamp after the first-play notice. Availability and preview limits belong to the provider; the Flickermood connection test is separate.</p>
+          <a href="../../index.html">Open the 3D collection ↗</a>
+        </form>
+  </details>
+  <noscript>This development preview needs JavaScript.</noscript>
+</body>
+</html>

@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#fafaf8">
+  <meta name="description" content="A compact disc collection on a three-dimensional listening desk. Pick a CD, load the SuperDrive and use the player on the laptop.">
+  <title>The Collection</title>
+  <link rel="icon" href="./music/assets/disc.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./scene.css">
+  <link rel="stylesheet" href="./graphics-settings.css">
+  <link rel="stylesheet" href="./music/player.css">
+  <script type="module" src="./scene.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#album-list">Skip to the CD collection</a>
+  <main>
+    <div class="scene-branding">
+      <header class="masthead"><a class="wordmark" href="./" aria-label="Atlas Reid, The Collection">Atlas Reid<span>.</span></a></header>
+      <div class="introduction"><h1>The Collection</h1></div>
+    </div>
+    <section class="scene-shell" id="scene-shell" aria-label="3D listening desk">
+      <canvas id="scene-canvas" tabindex="0" aria-label="3D listening desk: Midnight M4 MacBook Air on the left, SuperDrive to its right, and nine virtual CDs on the right-hand shelf. Hover a shelf case to preview; click to load. Hover the loaded case on the table to open it partway; click it to return the CD to the shelf. Drag to look around; scroll to zoom. Graphics contains Open Music, Reset view and Desktop only; the disc buttons below also work."></canvas>
+      <div class="scene-input" id="scene-input" aria-hidden="true"></div>
+      <div class="screen-layer" id="screen-layer">
+        <div class="screen-surface" id="screen-surface" hidden>
+          <div id="screen-wait" hidden><span class="spinner"></span><span id="screen-wait-text">Reading audio CD…</span></div>
+          <div id="screen-desktop" class="it-desktop-shell" aria-label="Laptop desktop">
+            <header class="screen-menu-bar" aria-label="Virtual desktop menu bar"><time id="screen-clock"></time></header>
+            <button id="desktop-disc" class="desktop-disc" type="button" hidden><img id="desktop-disc-cover" alt=""><span id="desktop-disc-title"></span><small>Virtual audio CD</small></button>
+            <section id="screen-music-window" class="it-music-frame" aria-label="Music window"><div id="player-root"></div></section>
+          </div>
+        </div>
+      </div>
+      <button class="screen-zoom" id="screen-zoom" type="button" aria-label="Open Music" title="Zoom into the laptop screen" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.2"/><path d="m15.1 15.1 4.5 4.5"/></svg><span>Open Music</span></button>
+      <div class="scene-boot" id="scene-boot"><span class="spinner"></span><span>Setting up the desk…</span></div>
+      <div class="scene-failure" id="scene-failure" hidden><p>This 3D study needs WebGL.</p><a href="./music/index.html">Open the CSS version ↗</a></div>
+    </section>
+    <section class="collection-panel" aria-label="Compact disc collection">
+      <div class="collection-bar">
+        <span class="collection-label"><span id="disc-count">09</span> VIRTUAL COMPACT DISCS</span>
+        <p class="visually-hidden" id="scene-status" role="status" aria-live="polite">Choose a CD from the shelf</p>
+        <div class="collection-panel-actions"><span id="collection-graphics-trigger"></span><button class="collection-collapse" id="collection-collapse" type="button" aria-label="Collapse collection" title="Collapse collection" aria-expanded="true" aria-controls="album-list"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button></div>
+      </div>
+      <nav class="album-list" id="album-list" aria-label="Choose a CD from the collection" tabindex="-1">
+        <footer class="collection-notice" id="collection-notice">
+          <p>Original material © 2026 Atlas Reid. An unofficial music-software love letter; not affiliated with Apple.</p>
+          <p>Music, artwork &amp; trademarks remain with their owners. Three.js © 2010–2026 three.js authors (MIT).</p>
+          <a href="./credits.html" target="_blank" rel="noopener" aria-label="Credits and notices (opens in a new tab)">Credits &amp; notices ↗</a>
+        </footer>
+      </nav>
+    </section>
+  </main>
+  <div class="notice" id="notice" role="status" aria-live="polite" hidden></div>
+  <div id="graphics-settings"></div>
+  <dialog id="mobile-player" aria-label="Music player"><div class="mobile-player-heading"><span>THE COLLECTION</span><div class="mobile-player-actions"><button id="mobile-graphics" type="button">Graphics</button><button id="close-mobile-player"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m10 6-6 6 6 6M4 12h16"/></svg><span>Back to desk</span></button></div></div><div id="mobile-player-mount"></div></dialog>
+  <noscript><p>JavaScript is needed for the 3D desk. <a href="./music/index.html">View the earlier CSS study.</a></p></noscript>
+</body>
+</html>

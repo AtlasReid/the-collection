@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" role="img" aria-labelledby="title desc">
+  <title id="title">Soft Transit by Violet Receiver</title>
+  <desc id="desc">Original demo artwork. A lilac sun sets into a violet horizon with delicate concentric contours.</desc>
+  <defs><linearGradient id="sky" x2="0" y2="1"><stop stop-color="#252044"/><stop offset=".58" stop-color="#8370ac"/><stop offset="1" stop-color="#c2a8cf"/></linearGradient><linearGradient id="sun" x2="0" y2="1"><stop stop-color="#f0d5df"/><stop offset="1" stop-color="#ae87ba"/></linearGradient></defs>
+  <path fill="url(#sky)" d="M0 0h600v600H0z"/>
+  <circle cx="300" cy="310" r="141" fill="url(#sun)"/>
+  <g fill="none" stroke="#ddd0e9" stroke-width=".8" opacity=".55"><ellipse cx="300" cy="457" rx="286" ry="47"/><ellipse cx="300" cy="457" rx="260" ry="38"/><ellipse cx="300" cy="457" rx="230" ry="29"/><ellipse cx="300" cy="457" rx="192" ry="20"/></g>
+  <path fill="#292348" d="M0 365c121 38 204 53 300 18s199-39 300-1v218H0z"/>
+  <g fill="#ece0ee" font-family="Arial,Helvetica,sans-serif"><text x="300" y="47" font-size="12" letter-spacing="4" text-anchor="middle">VIOLET RECEIVER</text><text x="300" y="535" font-size="49" letter-spacing="-1" text-anchor="middle">soft transit</text><text x="300" y="571" font-size="9" letter-spacing="2.4" text-anchor="middle">ORIGINAL DEMO · STEREO · 2026</text></g>
+  <path stroke="#ece0ee" stroke-width="1" d="M275 76h50"/>
+</svg>

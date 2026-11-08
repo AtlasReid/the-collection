@@ -1,0 +1,19 @@
+/* Managed windows share one desktop; stacking does not reload embedded media. */
+.it-window-host { position:relative; }
+.it-window-probe { position:absolute; display:block; width:0; height:0; padding:0; margin:0; border:0; pointer-events:none; visibility:hidden; }
+.it-managed-window { isolation:isolate; }
+.it-draggable-window { position:absolute; margin:0; }
+.it-window-drag-handle { cursor:grab; touch-action:none; user-select:none; }
+.it-window-drag-handle:focus-visible { outline:2px solid #ff244d; outline-offset:-3px; }
+.it-window-dragging .it-window-drag-handle { cursor:grabbing; }
+/* Prevent a media iframe from swallowing a drag already captured by its titlebar. */
+.it-window-dragging iframe { pointer-events:none; }
+.it-window-inactive .it-window-title { color:#85858c; }
+.it-floating-window { display:flex; flex-direction:column; overflow:hidden; max-width:calc(100% - 16px); max-height:calc(100% - 16px); border:1px solid #c9c9cf; border-radius:13px; background:#fff; color:#27272d; box-shadow:0 16px 45px #0004,0 2px 6px #0002; font:12px/1.4 -apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif; }
+.it-floating-titlebar { display:flex; align-items:center; gap:9px; min-height:38px; flex:none; padding:8px 11px; border-bottom:1px solid #e4e4e8; background:linear-gradient(#fdfdfd,#f3f3f6); }
+.it-window-title { flex:1; min-width:0; font-weight:600; }
+.it-floating-titlebar button { flex:none; border:0; border-radius:5px; padding:3px 7px; background:#e9e9ed; color:inherit; font:inherit; cursor:pointer; }
+.it-floating-titlebar button:hover { background:#dddde3; }
+.it-floating-titlebar .it-floating-close { box-sizing:border-box; display:grid; place-items:center; width:14px; height:14px; padding:0; border:1px solid #e14943; border-radius:50%; background:#ff6059; color:#6e1715; font-size:0; line-height:0; }
+.it-floating-titlebar .it-floating-close > svg.it-window-control-icon { display:block; width:8px; height:8px; margin:0; padding:0; fill:none; stroke:currentColor; stroke-width:2.5; stroke-linecap:round; stroke-linejoin:round; }
+.it-floating-titlebar .it-floating-close:hover { background:#ff837e; }

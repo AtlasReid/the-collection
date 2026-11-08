@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" role="img" aria-labelledby="title desc">
+  <title id="title">Orbital Notes by Red Meridian</title>
+  <desc id="desc">Original demo artwork. Precise cream orbital paths cross a cobalt field around a red disc.</desc>
+  <path fill="#2446b4" d="M0 0h600v600H0z"/>
+  <g fill="none" stroke="#f0eee0" stroke-width="1.4"><ellipse cx="300" cy="321" rx="238" ry="89" transform="rotate(-32 300 321)"/><ellipse cx="300" cy="321" rx="238" ry="89" transform="rotate(32 300 321)"/><ellipse cx="300" cy="321" rx="238" ry="89" transform="rotate(90 300 321)"/></g>
+  <circle fill="#ed493e" cx="300" cy="321" r="97"/>
+  <circle fill="#f0eee0" cx="300" cy="321" r="8"/>
+  <circle fill="#f0eee0" cx="107" cy="197" r="10"/>
+  <g fill="#f0eee0" font-family="Arial,Helvetica,sans-serif"><text x="28" y="43" font-size="11" letter-spacing="3">RED MERIDIAN</text><text x="26" y="100" font-size="51" letter-spacing="-2">Orbital Notes</text><text x="28" y="565" font-size="9" letter-spacing="1.5">ORIGINAL DEMO · COMPACT DISC · 2026</text><text x="572" y="565" font-size="11" text-anchor="end">06 / ∞</text></g>
+  <path stroke="#f0eee0" stroke-width="1" d="M28 122h544M28 535h544"/>
+</svg>

@@ -1,0 +1,23 @@
+.it-soundcloud-window { width:500px; max-width:calc(100% - 24px); max-height:calc(100% - 60px); }
+.it-soundcloud-window .it-window-title { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:12px; }
+.it-soundcloud-content { display:flex; flex:1; flex-direction:column; min-height:0; overflow:auto; overscroll-behavior:contain; scrollbar-width:thin; }
+.it-soundcloud-intro { display:flex; align-items:center; justify-content:space-between; flex:none; gap:10px; padding:11px 13px; border-bottom:1px solid #efeff2; background:#fafafc; font-size:11px; line-height:1.4; }
+.it-soundcloud-intro p { margin:0; }
+.it-soundcloud-intro p+p { margin-top:5px; color:#65656e; }
+.it-soundcloud-learn { flex:none; border:0; padding:0; background:transparent; color:#007aff!important; font:inherit; cursor:pointer; white-space:nowrap; }
+.it-soundcloud-learn:hover { text-decoration:underline; }
+.it-soundcloud-media { position:relative; flex:0 0 166px; width:100%; height:166px; min-height:166px; background:#f2f2f2; }
+.it-soundcloud-frame { display:block; width:100%; min-height:166px; height:166px; padding:0; border:0; background:#f2f2f2; }
+.it-soundcloud-media.is-loading .it-soundcloud-frame { opacity:0; pointer-events:none; }
+.it-soundcloud-loading { position:absolute; inset:0; display:grid; place-items:center; padding:15px; background:#f2f2f2; color:#777780; font-size:12px; text-align:center; }
+.it-soundcloud-loading[hidden] { display:none; }
+.it-soundcloud-credits { display:flex; align-items:flex-start; justify-content:space-between; flex:none; flex-wrap:wrap; gap:5px 12px; padding:10px 13px 0; font-size:10px; }
+.it-soundcloud-credits a { color:#5c5c65; text-decoration:none; }
+.it-soundcloud-credits a:hover { text-decoration:underline; }
+.it-soundcloud-status { flex:none; margin:0; padding:7px 13px 11px; color:#777780; font-size:10px; line-height:1.4; }
+.it-soundcloud-window button:focus-visible,.it-soundcloud-window a:focus-visible { outline:2px solid #ff244d; outline-offset:2px; }
+@media(max-width:430px) {
+  .it-soundcloud-intro { align-items:flex-start; flex-direction:column; gap:5px; padding-block:8px; }
+  .it-soundcloud-window .it-floating-titlebar { gap:6px; padding-inline:8px; }
+  .it-soundcloud-window .it-soundcloud-behind { font-size:10px; }
+}

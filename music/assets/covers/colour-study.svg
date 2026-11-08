@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" role="img" aria-labelledby="title desc">
+  <title id="title">Colour Study by The Sunday Shapes</title>
+  <desc id="desc">Original demo artwork. Vermilion circles cross a warm cream field with precise modernist typography.</desc>
+  <defs><clipPath id="field"><path d="M28 122h544v380H28z"/></clipPath></defs>
+  <path fill="#efe9d9" d="M0 0h600v600H0z"/>
+  <g fill="#dc432a" clip-path="url(#field)"><circle cx="168" cy="312" r="188"/><circle cx="460" cy="312" r="188"/></g>
+  <path fill="#efe9d9" d="M281 122h38v380h-38z"/>
+  <g fill="#272821" font-family="Arial,Helvetica,sans-serif"><text x="28" y="56" font-size="18" letter-spacing="3">THE SUNDAY SHAPES</text><text x="28" y="90" font-size="12" letter-spacing="2">STEREO / Nº 01</text><text x="26" y="556" font-size="47" font-weight="700" letter-spacing="-2">Colour Study</text><text x="572" y="576" font-size="10" letter-spacing="1.5" text-anchor="end">ORIGINAL DEMO · 2026</text></g>
+  <path stroke="#272821" stroke-width="1" d="M28 104h544M28 576h130"/>
+</svg>

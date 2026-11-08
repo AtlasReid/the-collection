@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#fafaf8">
+  <meta name="description" content="Atlas Reid's compact disc collection. An interactive listening desk, with a Razer Blade and Apple SuperDrive.">
+  <title>The Collection</title>
+  <link rel="icon" href="./assets/disc.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./music.css">
+  <link rel="stylesheet" href="./player.css">
+  <script type="module" src="./music.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#collection">Skip to the discs</a>
+  <header class="masthead">
+    <a class="wordmark" href="../" aria-label="Atlas Reid, The Collection">Atlas Reid<span class="wordmark-dot">.</span></a>
+    <span class="section-label">PERSONAL COLLECTION <span class="label-rule"></span> 001</span>
+  </header>
+  <main>
+    <div class="introduction">
+      <h1>The Collection</h1>
+      <p class="intro-note">A little collection of compact discs.<br>Pick one up. Put a record on.</p>
+    </div>
+    <section class="desk" aria-label="Listening desk with laptop, SuperDrive and nine virtual compact discs">
+      <div class="desk-halo" aria-hidden="true"></div>
+      <svg class="usb-cable" viewBox="0 0 1400 710" preserveAspectRatio="none" aria-hidden="true"><path class="cable-shadow" d="M 1022 418 C 1130 370 1138 483 1078 477 C 1018 473 1054 402 1040 400"/><path d="M 1022 415 C 1130 367 1138 480 1078 474 C 1018 470 1054 399 1040 397"/></svg>
+      <div class="laptop">
+        <div class="laptop-photo"><img src="./assets/blade-front.png" alt="Open black Razer Blade 15 laptop, supplied reference for the owner's 2023 laptop" draggable="false"></div>
+        <div class="laptop-screen">
+          <div class="desktop" id="desktop">
+            <div class="desktop-lines" aria-hidden="true"></div>
+            <div class="desktop-shortcut"><span class="music-icon" aria-hidden="true">♫</span><span>iTunes</span></div>
+            <div class="desktop-message"><span class="desktop-disc" aria-hidden="true">◎</span><span>Your next listen<br><strong>starts with a disc.</strong></span></div>
+            <div class="taskbar"><span class="windows-mark" aria-hidden="true">⊞</span><span>Razer Blade 15</span><span class="taskbar-time">Your little listening desk.</span></div>
+          </div>
+          <div class="player-viewport" id="screen-player" hidden><div id="player-root"></div></div>
+          <div class="screen-loading" id="screen-loading" hidden><span class="loading-ring" aria-hidden="true"></span><span id="loading-label">Reading disc…</span></div>
+        </div>
+        <div class="laptop-caption"><span class="hardware-label">RAZER BLADE 15 <span>2023</span></span><button class="text-button" id="expand-player" disabled>Expand player <span aria-hidden="true">↗</span></button></div>
+      </div>
+      <div class="drive" id="drive">
+        <div class="drive-photo"><img src="./assets/superdrive-front.png" alt="Silver Apple USB SuperDrive, connected to the laptop" draggable="false"></div>
+        <div class="drive-slot" aria-hidden="true"></div>
+        <div class="drive-caption"><span class="drive-led" aria-hidden="true"></span><span id="drive-status">APPLE SUPERDRIVE</span></div>
+      </div>
+      <div class="collection" id="collection" aria-label="Choose a compact disc from the collection"></div>
+      <div class="desk-instruction"><span class="instruction-dot" aria-hidden="true"></span><span id="desk-status" role="status" aria-live="polite">Choose any CD to start listening</span></div>
+    </section>
+    <div class="collection-footer"><span><span id="disc-count">08</span> COMPACT DISCS</span><p>Something you can hold.<br>Something worth keeping.</p><span class="demo-label">THE COLLECTION <span aria-hidden="true">↗</span></span></div>
+  </main>
+  <dialog id="player-dialog" aria-label="Expanded music player">
+    <div class="dialog-heading"><span>THE COLLECTION</span><button id="close-player" class="text-button">Back to the desk <span aria-hidden="true">↙</span></button></div>
+    <div class="player-viewport" id="expanded-player"></div>
+  </dialog>
+  <div class="notice" id="notice" role="status" aria-live="polite" hidden></div>
+  <noscript><p class="noscript">Enable JavaScript to choose a CD and try the virtual player.</p></noscript>
+</body>
+</html>

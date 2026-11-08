@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" role="img" aria-labelledby="title desc">
+  <title id="title">Golden Static by The Small Hours Trio</title>
+  <desc id="desc">Original demo artwork. Ochre, burnt orange and ink blue shapes form an abstract jazz composition.</desc>
+  <path fill="#d5a24a" d="M0 0h600v600H0z"/>
+  <path fill="#f0ddaa" d="M39 145h522v342H39z"/>
+  <path fill="#a84429" d="M39 145h140v342H39zM375 145h186v120H375z"/>
+  <path fill="#293d43" d="M179 145h114v212c0 75-61 130-137 130v-99c18 0 23-12 23-31z"/>
+  <path fill="#b5782d" d="M375 145h-82v342h82z"/>
+  <circle fill="#d5a24a" cx="469" cy="376" r="82"/><circle fill="#293d43" cx="469" cy="376" r="34"/>
+  <path stroke="#f0ddaa" stroke-width="2" d="M72 172v286M86 172v286M100 172v286"/>
+  <g fill="#293d43" font-family="Arial,Helvetica,sans-serif"><text x="39" y="49" font-size="13" letter-spacing="2">THE SMALL HOURS TRIO</text><text x="35" y="109" font-size="54" font-weight="700" letter-spacing="-2">Golden Static</text><text x="39" y="533" font-size="11" letter-spacing="2">THREE PLAYERS. ONE ROOM.</text><text x="39" y="568" font-size="9" letter-spacing="1.4">ORIGINAL DEMO / STEREO / 2026</text><text x="560" y="568" font-size="23" text-anchor="end">05</text></g>
+</svg>
