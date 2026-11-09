@@ -1,8 +1,8 @@
 # Assets and sources
 
-Updated 8 November 2026. This record covers the packaged assets, their public sources and their rights limits.
+Updated 9 November 2026. This record covers the packaged assets, their public sources and their rights limits.
 
-The shared collection contains **nine real album catalogues and 324 track entries**: six SoundCloud snapshots, two Bandcamp snapshots and one Apple Music catalogue with partial SoundCloud matches. The 3D desk, standalone desktop and CSS compatibility view use the same list. Album artwork is reused on case inserts, full-face circular disc prints and the desktop CD icon. These are album-art visualisations, not scans or verified reproductions of physical CD labels. No audio was downloaded.
+The shared collection contains **nine real album catalogues and 324 track entries**: six SoundCloud snapshots, two Bandcamp snapshots and one Apple Music catalogue with partial SoundCloud matches. The 3D desk and standalone desktop use the same list. Album artwork is reused on case inserts, full-face circular disc prints and the desktop CD icon. These are album-art visualisations, not scans or verified reproductions of physical CD labels. No audio was downloaded.
 
 | Current album | Provider | Complete source snapshot |
 | --- | --- | --- |
@@ -35,14 +35,12 @@ The shared collection contains **nine real album catalogues and 324 track entrie
 | `../music/soundcloud-sonder-album.js`, `../music/assets/covers/sonder.jpg` | Complete 12-track Sonder (2023) digital edition from public SoundCloud album/track metadata, checked 8 November 2026. Includes Don't Forget Me at track 8. Official 1080×1080 JPG cover: 284,656 bytes. Third-party, all-rights-reserved material. |
 | `../music/bandcamp-window.js` | A visible official Bandcamp iframe with artist/source links. It uses validated album/track identifiers, not copied audio or an unofficial playback API. |
 | `../music/assets/disc.svg` | Original disc icon used by the pages and Forss diagnostic. |
-| `../music/assets/blade-front.png` | Owner-supplied Razer product-reference photograph used by the CSS compatibility view; it does not depict the active 3D MacBook. |
-| `../music/assets/superdrive-front.png` | Supplied product-reference photograph used by the CSS compatibility composition. |
 | `../vendor/three/three.module.js`, `three.core.js` | Vendored Three.js r185 renderer/core modules; both are required. Their separate MIT licence is `../vendor/three/LICENSE`. |
 | Root hardware/media modules | Original procedural meshes and generated keyboard-legend, cover and material textures. The model's panel is plain black and untextured; wallpaper is rendered only by the virtual desktop. No downloaded third-party CAD/glTF model is included. |
 | `../laptop.js` | Procedural Razer comparison fixture used by `check-macbook.mjs`; excluded from the active scene. |
-| `../dev/music/assets/wallpaper.jpg` | Owner-supplied cliff photograph, resized proportionally from 3420×2224 to 2560×1665 and encoded as quality-88 JPEG, 1,049,142 bytes. Shared by the development desktop, inline player and full-panel virtual desktop. No UI is baked into it. The physical model instead has a generated 768×320 keyboard atlas and an untextured display panel. |
+| `../dev/music/assets/wallpaper.jpg` | Scottish Highlands photograph taken by Atlas Reid from a train on the way to Glasgow; supplied for this demo on 9 November 2026. The supplied 1024×768 JPEG is included unchanged, 199,841 bytes. Copyright Atlas Reid; all rights retained. Shared by the standalone desktop preview and the 3D laptop's projected/focused desktop. No UI is baked into it. The physical model instead has a generated 768×320 keyboard atlas and an untextured display panel. |
 
-No separate redistribution licence has been documented for the supplied wallpaper or two CSS product photographs. Their inclusion and attribution do not imply an open-source licence or publication permission.
+The owner supplied their own wallpaper photograph for this demo; it is not offered under an open-source licence.
 
 No open-source licence has been selected for the application code or its original assets. Three.js's MIT licence applies to that dependency only. Product names and marks identify an unofficial visual study; no manufacturer affiliation or endorsement is implied.
 

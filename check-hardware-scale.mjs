@@ -131,6 +131,27 @@ test('all nine requested albums have separate physical cases and matching CD art
   assert.equal(new Set(records.map(record => record.lid.getObjectByName('Album cover artwork').material.map)).size, records.length, 'each album keeps its own artwork');
 });
 
+test('printed case fronts have no competing paper surface while retaining the reverse through lid motion', () => {
+  const ray = new THREE.Raycaster();
+  for (const record of records) {
+    place(record, shelf.tablePose);
+    const cover = named(record.lid, 'Album cover artwork');
+    const paper = named(record.lid, 'Lid paper insert');
+    for (const angle of [0, Math.PI / 3, 2 * Math.PI / 3]) {
+      record.setOpen(angle); record.group.updateMatrixWorld(true);
+      const normal = new THREE.Vector3(0, 0, 1).transformDirection(cover.matrixWorld);
+      for (const x of [-.45, 0, .45]) for (const y of [-.45, 0, .45]) {
+        const point = cover.localToWorld(new THREE.Vector3(x, y, 0));
+        ray.set(point.clone().addScaledVector(normal, mm(20)), normal.clone().negate());
+        const printHit = ray.intersectObject(cover)[0], reverseHit = ray.intersectObject(paper)[0];
+        assert.ok(printHit && reverseHit, 'the print and solid paper reverse must both remain present');
+        assert.ok(reverseHit.distance - printHit.distance > mm(.3), 'a nearly coincident paper face can flicker through the cover');
+      }
+    }
+    record.setOpen(0); place(record, shelf.poseFor(record));
+  }
+});
+
 test('generated Air body and complete drive housing use the published footprints', () => {
   near(bodySize.x, mm(304.1), EPS, 'Air width');
   near(bodySize.z, mm(215), EPS, 'Air depth');

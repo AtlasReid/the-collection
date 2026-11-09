@@ -26,6 +26,18 @@ function horizontal(mesh, height) {
   return mesh;
 }
 
+function paperBacking() {
+  const geometry = new THREE.BoxGeometry(1.20, .006, 1.20);
+  const indices = geometry.getIndex();
+  // The artwork is the paper's front face. Keeping an almost coincident cream
+  // box face beneath it makes the two surfaces fight for depth as the camera
+  // moves. Retain the reverse and edge faces, with no second front surface.
+  geometry.setIndex(geometry.groups.filter(group => group.materialIndex !== 2)
+    .flatMap(group => Array.from({ length: group.count }, (_, index) => indices.getX(group.start + index))));
+  geometry.clearGroups();
+  return geometry;
+}
+
 function printedRing(inner, outer) {
   const geometry = new THREE.RingGeometry(inner, outer, 80);
   const position = geometry.getAttribute('position');
@@ -72,7 +84,7 @@ export async function createDiscCollection(albums, onTexture = () => {}) {
   const geometries = {
     caseBody: new THREE.BoxGeometry(CASE_WIDTH, .035, CASE_DEPTH),
     cover: new THREE.PlaneGeometry(1.20, 1.20),
-    paper: new THREE.BoxGeometry(1.20, .006, 1.20),
+    paper: paperBacking(),
     spine: new THREE.BoxGeometry(.105, .035, 1.20),
     rib: new THREE.BoxGeometry(.106, .004, .017),
     longEdge: new THREE.BoxGeometry(CASE_WIDTH, .018, .014),

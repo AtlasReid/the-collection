@@ -16,7 +16,7 @@ INTERFACE REFERENCES
 Apple Music and macOS inspired the familiar menus; the machinery underneath is homemade. Apple, Mac, macOS and Apple Music are trademarks of Apple Inc. This desktop has no Apple account connection, access to a real Music library, physical CD importing or subscription checkout. Its system commands stay inside this little stage set.
 
 PHOTOGRAPHS AND ARTWORK
-The cliff wallpaper was supplied by the owner and resized for this prototype. No separate source-photograph licence has been established. The earlier CSS compatibility view retains supplied Razer and SuperDrive product-reference photographs; their inclusion does not imply an open-source licence.
+The Scottish Highlands wallpaper was photographed by Atlas Reid from a train on the way to Glasgow and supplied for this demo. Copyright Atlas Reid; all rights retained.
 
 The SoundCloud catalogue includes Portraits by Simon Thoumire and Dave Milligan, Frieren: Beyond Journey's End (Original Soundtrack) by Evan Call, Without Fear (The Complete Edition), Sonder (2023) and I've told the trees everything by Dermot Kennedy, and Clair Obscur: Expedition 33 (Original Soundtrack) by Lorien Testard. Their public metadata snapshots and provider artwork supply the virtual albums. That artwork is third-party, all-rights-reserved material, not original demo art. Virtual disc labels are illustrative, not scans of physical CDs. No audio or streaming URLs are copied into this project. Source and provenance details are recorded in docs/ASSETS.md.
 

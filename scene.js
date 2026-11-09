@@ -23,6 +23,7 @@ const sceneInput = $('#scene-input');
 const surface = $('#screen-surface');
 const playerRoot = $('#player-root');
 const desktop = $('#screen-desktop');
+const screenOpenDesktop = $('#screen-open-desktop');
 const musicFrame = $('#screen-music-window');
 const waitScreen = $('#screen-wait');
 const status = $('#scene-status');
@@ -44,6 +45,7 @@ let renderer, keyLight, hardware, shelf, caseHover, framingBounds, compositionBo
 let orbitCentered=true;
 let frame=0, ready=false, failed=false, busy=false, inserted=null, mode='desk';
 let gesture=null, cameraMotion=null, noticeTimer, token=0;
+let desktopReturnGesture=null;
 let hovering=null;
 let screenQuad=null,screenAnchor=null,screenFacing=false;
 let screenPointer=null,zoomHovered=false;
@@ -218,6 +220,12 @@ function setFocusedLayout(active){
   if(renderer)sizeRenderer();
   return prepareShellFlight(from);
 }
+function updateDesktopInput(){
+  const interactive=mobileDialog.open||mode==='player'&&!cameraMotion;
+  desktop.inert=!interactive;
+  screenOpenDesktop.hidden=interactive||mode==='player'||mobileDialog.open;
+  screenOpenDesktop.disabled=!ready||busy||Boolean(cameraMotion);
+}
 function applyHome(immediate=false,{layoutFrom=null}={}){
   const layout=setFocusedLayout(false)||(layoutFrom?prepareShellFlight(layoutFrom):null);
   mode='desk';shell.dataset.mode=mode;
@@ -256,6 +264,12 @@ function focusPlayer({restoreMusic=true,animate=true,layoutFrom=null}={}){
   moveCamera(centre.clone().addScaledVector(normal,distance),centre,animate?1015:0,{up,layout,delay:animate?80:0});
   updateScreenZoom();
 }
+// Pointer gestures use the physical display hit below; a native button also
+// gives keyboard users one reachable entry point without tiny desktop targets.
+screenOpenDesktop.addEventListener('click',event=>{
+  event.preventDefault();
+  if(event.detail===0&&mode==='desk')focusPlayer({restoreMusic:false});
+});
 screenZoom.addEventListener('click',()=>mode==='player'?applyHome():focusPlayer());
 screenZoom.addEventListener('pointerenter',()=>{zoomHovered=true;updateScreenZoom();});
 screenZoom.addEventListener('pointerleave',()=>{zoomHovered=false;updateScreenZoom();});
@@ -263,6 +277,7 @@ screenZoom.addEventListener('focus',updateScreenZoom);
 screenZoom.addEventListener('blur',updateScreenZoom);
 
 function updateScreenZoom(){
+  updateDesktopInput();
   const returning=mode==='player';
   // The stage scales during its flight. Hide its UI until it has native size.
   const transitioning=Boolean(cameraMotion||shell.style.transform&&shell.style.transform!=='none');
@@ -553,8 +568,25 @@ function pointRay(event){
 function scenePointerTarget(event){
   if(event.target===sceneInput||event.target===canvas)return true;
   if(!surface.contains(event.target))return false;
+  if(mode==='desk')return true;
   pointRay(event);
   return Boolean(screenOccluder(raycaster,screenAperture,[hardware.group,shelf.group,...records.flatMap(r=>[r.group,r.disc])]));
+}
+function exposedScreenAt(event){
+  if(!screenFacing||!screenAperture?.visible)return false;
+  pointRay(event);
+  return raycaster.intersectObject(screenAperture,false).length>0&&!screenOccluder(raycaster,screenAperture,[hardware.group,shelf.group,...records.flatMap(r=>[r.group,r.disc])]);
+}
+function outsideDesktopAt(event){
+  if(!ready||failed||cameraMotion)return null;
+  if(mobileDialog.open){
+    if(event.target!==mobileDialog)return null;
+    const bounds=mobileDialog.getBoundingClientRect();
+    return event.clientX<bounds.left||event.clientX>bounds.right||event.clientY<bounds.top||event.clientY>bounds.bottom?'compact':null;
+  }
+  if(mode!=='player'||!scenePointerTarget(event))return null;
+  pointRay(event);
+  return raycaster.intersectObject(hardware.laptop,true).length?null:'scene';
 }
 function hitAt(event){
   pointRay(event);
@@ -571,13 +603,13 @@ function hitAt(event){
   while(object){const record=records.find(r=>r.group===object);if(record)return record;object=object.parent;}
   return null;
 }
-// Canvas colour is above the DOM, but its box must not intercept native HTML
-// controls. A transparent input surface handles empty scene space; capture-phase
-// routing also catches physical objects covering an otherwise live HTML button.
+// Desk mode treats the projected desktop as one entry target. Focused mode
+// restores native HTML controls, with physical foreground objects still routed
+// through the scene instead of reaching a button behind them.
 shell.addEventListener('pointerdown',event=>{
   if(!ready||event.button!==0||mode==='player'||!scenePointerTarget(event))return;
   event.preventDefault();sceneInput.setPointerCapture(event.pointerId);canvas.focus({preventScroll:true});retainDisplayedOrbit();
-  gesture={id:event.pointerId,x:event.clientX,y:event.clientY,lastX:event.clientX,lastY:event.clientY,dragged:false,record:busy?null:hitAt(event)};
+  gesture={id:event.pointerId,x:event.clientX,y:event.clientY,lastX:event.clientX,lastY:event.clientY,dragged:false,screen:!busy&&exposedScreenAt(event),record:busy?null:hitAt(event)};
   updateScreenZoom();
 },true);
 shell.addEventListener('pointermove',event=>{
@@ -601,7 +633,9 @@ shell.addEventListener('pointerup',event=>{
   if(!gesture||event.pointerId!==gesture.id)return;
   const g=gesture;gesture=null;
   if(sceneInput.hasPointerCapture(event.pointerId))sceneInput.releasePointerCapture(event.pointerId);
-  if(!busy&&!g.dragged&&g.record){
+  if(!busy&&!g.dragged&&g.screen&&exposedScreenAt(event)){
+    focusPlayer({restoreMusic:false});
+  }else if(!busy&&!g.dragged&&g.record){
     if(g.record===inserted&&g.record.location==='table')eject();else loadDisc(g.record);
   }else if(!busy&&mode==='desk')hoverCase(hitAt(event));
   updateScreenZoom();
@@ -610,6 +644,7 @@ shell.addEventListener('pointercancel',()=>{gesture=null;hoverCase(null);updateS
 sceneInput.addEventListener('lostpointercapture',()=>{gesture=null;hoverCase(null);updateScreenZoom();});
 shell.addEventListener('pointerleave',()=>{screenPointer=null;zoomHovered=false;updateScreenZoom();if(!gesture)hoverCase(null);});
 shell.addEventListener('click',event=>{
+  if(event.target===screenOpenDesktop&&event.detail===0)return;
   if(ready&&surface.contains(event.target)&&scenePointerTarget(event)){event.preventDefault();event.stopImmediatePropagation();}
 },true);
 shell.addEventListener('wheel',event=>{
@@ -618,6 +653,31 @@ shell.addEventListener('wheel',event=>{
   orbit.radius=THREE.MathUtils.clamp(orbit.radius*Math.exp(event.deltaY*.001),zoomFloor,zoomCeiling);
   setOrbitCamera();invalidate();
 },{passive:false,capture:true});
+// Only a stationary press that starts and ends outside returns to the desk.
+// Separate ownership keeps desktop drags and camera motion out of this route.
+document.addEventListener('pointerdown',event=>{
+  if(event.button!==0||event.isPrimary===false)return;
+  const kind=outsideDesktopAt(event);
+  if(!kind)return;
+  const host=kind==='compact'?mobileDialog:sceneInput;
+  desktopReturnGesture={id:event.pointerId,x:event.clientX,y:event.clientY,dragged:false,kind,host};
+  host.setPointerCapture(event.pointerId);event.preventDefault();
+},true);
+document.addEventListener('pointermove',event=>{
+  if(desktopReturnGesture?.id===event.pointerId&&Math.hypot(event.clientX-desktopReturnGesture.x,event.clientY-desktopReturnGesture.y)>6)desktopReturnGesture.dragged=true;
+},true);
+document.addEventListener('pointerup',event=>{
+  if(desktopReturnGesture?.id!==event.pointerId)return;
+  const press=desktopReturnGesture;desktopReturnGesture=null;
+  if(press.host.hasPointerCapture(event.pointerId))press.host.releasePointerCapture(event.pointerId);
+  if(press.dragged||outsideDesktopAt(event)!==press.kind)return;
+  event.preventDefault();
+  if(press.kind==='compact')mobileDialog.close();
+  applyHome();canvas.focus({preventScroll:true});
+},true);
+for(const name of ['pointercancel','lostpointercapture'])document.addEventListener(name,event=>{
+  if(desktopReturnGesture?.id===event.pointerId)desktopReturnGesture=null;
+},true);
 canvas.addEventListener('keydown',event=>{
   if(!ready)return;
   const step=.07;
@@ -699,6 +759,6 @@ async function init(){
     surface.hidden=false;waitScreen.hidden=true;
     setBusy(false);resize();invalidate();
     new ResizeObserver(resize).observe(shell);
-  }catch(error){failed=true;$('#scene-boot').hidden=true;$('#scene-failure').hidden=false;surface.hidden=true;status.textContent='The 3D scene could not start. The CSS study is still available.';console.error('Music scene:',error);}
+  }catch(error){failed=true;$('#scene-boot').hidden=true;$('#scene-failure').hidden=false;surface.hidden=true;status.textContent='The 3D scene could not start. The desktop preview is still available.';console.error('Music scene:',error);}
 }
 init();

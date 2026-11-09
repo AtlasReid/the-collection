@@ -133,6 +133,17 @@ test('the actual notch and camera remain in front of the aperture and block HTML
   const notchDepth=notch.position.z-screen.position.z,cameraDepth=camera.position.z-screen.position.z;
   assert.ok(aperture.position.z>0&&aperture.position.z<notchDepth);
   assert.ok(aperture.position.z<cameraDepth);
+  // Keep the raster depth separation as well as the physical/raycast order:
+  // oblique views can quantise the submillimetre gap into equal depth values.
+  const glass=laptop.getObjectByName('Continuous black display glass');
+  assert.notEqual(notch.material,glass.material,'notch bias must not affect the shared bezel/recess material');
+  assert.equal(glass.material.polygonOffset,false);
+  for(const detail of [notch,camera]){
+    assert.equal(detail.material.polygonOffset,true,'the active aperture must not clear notch/camera pixels at distant angles');
+    assert.ok(detail.material.polygonOffsetFactor<0&&detail.material.polygonOffsetUnits<0);
+    assert.equal(detail.material.depthTest,true,'physical foreground media must still cover the hardware details');
+  }
+  assert.ok(camera.material.polygonOffsetFactor<notch.material.polygonOffsetFactor&&camera.material.polygonOffsetUnits<notch.material.polygonOffsetUnits,'the lens must retain foreground order over the notch');
   assert.equal(screenOccluder(panelRay(screen,.1,height/2-.043),aperture,[laptop])?.object,notch);
   assert.equal(screenOccluder(panelRay(screen,0,height/2-.036),aperture,[laptop])?.object,camera);
   assert.equal(screenOccluder(panelRay(screen,.3,height/2-.043),aperture,[laptop]),null,'nearby top-menu input stays usable');

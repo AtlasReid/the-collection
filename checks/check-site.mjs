@@ -23,6 +23,7 @@ const prefix='/the-collection/';
 const origin='https://collection.invalid';
 const siteURL=new URL(prefix,origin);
 const resources=new Set();
+const retiredCompatibilityFiles=['music/index.html','music/music.js','music/music.css','music/assets/blade-front.png','music/assets/superdrive-front.png'];
 const texts=new Map();
 const tests=[];
 const test=(name,run)=>tests.push({name,run});
@@ -119,13 +120,11 @@ async function include(reference,relative) {
   }
 }
 
-test('both entry pages use The Collection and omit the removed presentation',async()=>{
-  for(const relative of ['index.html','music/index.html']) {
-    const text=await source(relative);
-    assert.match(text,/<title>The Collection<\/title>/);
-    assert.match(text,/<h1>The Collection<\/h1>/);
-    assert.doesNotMatch(text,/Good music\.|Physical copies\.|THE LISTENING DESK|id=["'](?:show-references|reference-dialog)["']|class=["'](?:eyebrow|prototype-note)["']/);
-  }
+test('the main entry uses The Collection and omits the removed presentation',async()=>{
+  const text=await source('index.html');
+  assert.match(text,/<title>The Collection<\/title>/);
+  assert.match(text,/<h1>The Collection<\/h1>/);
+  assert.doesNotMatch(text,/Good music\.|Physical copies\.|THE LISTENING DESK|id=["'](?:show-references|reference-dialog)["']|class=["'](?:eyebrow|prototype-note)["']/);
   assert.doesNotMatch(await source('scene.js'),/\$\(['"]#(?:show-references|reference-dialog|close-references)['"]\)/);
 });
 
@@ -171,8 +170,9 @@ test('the floating collection keeps its accessible controls outside the animated
 
 test('HTML links, styles and the complete static module graph stay inside the checkout',async()=>{
   await include('./index.html','index.html');
-  assert.ok(resources.has('music/index.html'),'3D fallback is absent');
-  assert.ok(resources.has('music/music.js'),'CSS fallback cannot start');
+  assert.ok(resources.has('dev/music/index.html'),'The WebGL-independent desktop fallback is absent');
+  assert.ok(resources.has('dev/music/preview.js'),'The desktop fallback cannot start');
+  for(const relative of retiredCompatibilityFiles)assert.equal(resources.has(relative),false,`Retired compatibility resource remains reachable: ${relative}`);
   assert.ok(resources.has('screen-aperture.js'),'Live screen depth helper is absent');
   assert.ok(resources.has('vendor/three/three.module.js'));
   assert.ok(resources.has('vendor/three/three.core.js'),'Vendored Three.js core dependency is absent');
@@ -194,7 +194,7 @@ test('the requested nine full catalogues replace demos without sharing track ide
   assert.equal(new Set(tracks.map(track=>track.id)).size,tracks.length,'Favourite/import identifiers must not collide between albums');
 });
 
-test('dynamic cover URLs resolve at the same repository prefix in both renderers',async()=>{
+test('dynamic cover URLs resolve at the same repository prefix in the scene and desktop',async()=>{
   assert.ok(albums.length>0,'No catalogue records');
   for(const relative of ['scene.js','discs.js']) {
     const text=await source(relative);
@@ -208,7 +208,8 @@ test('dynamic cover URLs resolve at the same repository prefix in both renderers
       await include(url.pathname.slice(prefix.length),'index.html');
     }
   }
-  for(const album of albums)await include(album.cover,'music/index.html');
+  const previewMusicURL=new URL('../../music/',new URL('dev/music/preview.js',siteURL));
+  for(const album of albums)await include(new URL(album.cover,previewMusicURL).pathname.slice(prefix.length),'index.html');
   const covers=[...resources].filter(relative=>relative.startsWith('music/assets/covers/'));
   assert.equal(new Set(albums.map(album=>album.cover)).size,albums.length,'Each real album needs its own cover asset');
   assert.equal(covers.length,albums.length,'Only the production collection covers belong to the runtime graph');
@@ -379,12 +380,8 @@ test('replacing demo cases preserves existing real imports, preferences and the 
   for(const [key,value]of before)if(![libraryKey,interfaceKey].includes(key))assert.equal(entries.get(key),value,`Unrelated record changed: ${key}`);
 });
 
-test('compatibility photographs and the vendored licence ship with the static site',async()=>{
-  for(const relative of ['music/assets/blade-front.png','music/assets/superdrive-front.png']) {
-    assert.ok(resources.has(relative),`Compatibility image is unreachable: ${relative}`);
-    const bytes=await readFile(file(relative));
-    assert.deepEqual([...bytes.subarray(0,8)],[137,80,78,71,13,10,26,10],`Invalid PNG: ${relative}`);
-  }
+test('retired compatibility files are absent while the vendored licence remains packaged',async()=>{
+  for(const relative of retiredCompatibilityFiles)await assert.rejects(stat(file(relative)),{code:'ENOENT'},`Retired compatibility file remains packaged: ${relative}`);
   await exactFile('vendor/three/LICENSE');
   assert.match(await source('vendor/three/LICENSE'),/The MIT License/);
   await exactFile('.nojekyll');
@@ -433,8 +430,8 @@ test('the real preview server redirects root and the bare repository prefix',asy
   }
 });
 
-test('nested root and compatibility routes return the actual entry pages',async()=>{
-  for(const [url,relative]of [[prefix,'index.html'],[`${prefix}music/`,'music/index.html']]) {
+test('nested root and desktop routes return the actual entry pages',async()=>{
+  for(const [url,relative]of [[prefix,'index.html'],[`${prefix}dev/music/`,'dev/music/index.html']]) {
     const result=await request(url);
     assert.equal(result.status,200,url);
     assert.match(result.headers['content-type'],/^text\/html/);
@@ -454,19 +451,19 @@ test('every reachable runtime resource is served intact with a browser-usable MI
 });
 
 test('HEAD preserves resource headers and unsupported write methods are rejected',async()=>{
-  const relative='music/assets/blade-front.png';
+  const relative='dev/music/assets/wallpaper.jpg';
   const head=await request(`${prefix}${relative}`,{method:'HEAD'});
   assert.equal(head.status,200);
   assert.equal(head.body.length,0);
   assert.equal(Number(head.headers['content-length']),(await stat(file(relative))).size);
-  assert.equal(head.headers['content-type'],'image/png');
+  assert.equal(head.headers['content-type'],'image/jpeg');
   const post=await request(prefix,{method:'POST'});
   assert.equal(post.status,405);
   assert.equal(post.headers.allow,'GET, HEAD');
 });
 
-test('missing resources and routes outside the configured prefix cannot alias the app',async()=>{
-  for(const rawPath of ['/index.html','/other-site/',`${prefix}missing-file.js`]) {
+test('retired files, missing resources and routes outside the configured prefix cannot alias the app',async()=>{
+  for(const rawPath of ['/index.html','/other-site/',`${prefix}missing-file.js`,`${prefix}music/`,...retiredCompatibilityFiles.map(relative=>`${prefix}${relative}`)]) {
     assert.equal((await request(rawPath)).status,404,rawPath);
   }
 });

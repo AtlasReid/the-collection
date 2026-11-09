@@ -174,9 +174,15 @@ export function createLaptop() {
   const screen=add(lid,displayGeometry(screenWidth,screenHeight),new THREE.MeshBasicMaterial({color:0x000000,toneMapped:false}),
     'Notched Liquid Retina display',[0,screenCentre,.023]);
   screen.castShadow=false;screen.receiveShadow=false;screen.userData.screenWidth=screenWidth;screen.userData.screenHeight=screenHeight;
-  const notch=add(lid,new THREE.ShapeGeometry(roundShape(.47,.095,.018),5),materials.recess,'Display notch',[0,CHIN+screenHeight-.043,.0235]);
+  // The aperture is only .0003 units behind this printed-on-glass detail.
+  // At oblique/distant views its depth can quantise into the same bucket and
+  // clear alternating notch pixels. Bias these two details toward the camera
+  // without changing the physical contour or the shared recess material.
+  const notchMaterial=materials.recess.clone();
+  notchMaterial.polygonOffset=true;notchMaterial.polygonOffsetFactor=-1;notchMaterial.polygonOffsetUnits=-1;
+  const notch=add(lid,new THREE.ShapeGeometry(roundShape(.47,.095,.018),5),notchMaterial,'Display notch',[0,CHIN+screenHeight-.043,.0235]);
   notch.castShadow=false;notch.receiveShadow=false;
-  const lens=add(lid,new THREE.CircleGeometry(.016,24),new THREE.MeshBasicMaterial({color:'#17212a'}),'Notch camera',[0,CHIN+screenHeight-.036,.024]);
+  const lens=add(lid,new THREE.CircleGeometry(.016,24),new THREE.MeshBasicMaterial({color:'#17212a',polygonOffset:true,polygonOffsetFactor:-2,polygonOffsetUnits:-2}),'Notch camera',[0,CHIN+screenHeight-.036,.024]);
   lens.castShadow=false; lens.receiveShadow=false;
   const emblem=add(lid,appleEmblem(),new THREE.MeshStandardMaterial({color:'#090c11',metalness:.75,roughness:.25}),
     'Subtle rear Apple silhouette',[0,LID_HEIGHT*.51,-.0215],[0,Math.PI,0]);
