@@ -240,6 +240,8 @@
 .it-window-tools { position:absolute; z-index:6; top:8px; right:12px; display:flex; gap:6px; }
 .it-window-tools button { width:23px; height:23px; padding:0; border:0; border-radius:50%; background:#f1f1f3; color:#77777d; font-size:15px; }
 .it-window-tools button:hover { background:#e9e9ed; color:var(--it-red); }
+.it-window-tools .it-window-tool { display:grid; place-items:center; }
+.it-window-tools .it-window-tool svg { display:block; width:16px; height:16px; margin:0; fill:none; }
 /* A stable title bar owns dragging; its controls remain native buttons. */
 .it-music-titlebar { position:absolute; z-index:8; inset:0 0 auto; display:flex; align-items:center; justify-content:space-between; height:34px; padding:0 13px; }
 .it-music-titlebar .it-window-controls { position:static; width:auto; height:auto; align-self:center; padding:0; gap:6px; }
@@ -310,6 +312,8 @@
 .it-silver-button { min-height:23px; padding:3px 9px; border:0; border-radius:6px; background:#ededee; box-shadow:none; font-size:10px!important; }
 .it-silver-button:hover { background:#e3e3e6; }
 .it-album-actions [data-action="disc-options"],.it-album-actions [data-action="album-options"] { min-width:23px; padding:3px 5px; border-radius:50%; color:var(--it-red); }
+.it-album-actions .it-album-tool { display:grid; place-items:center; width:23px; height:23px; padding:3px; border-radius:50%; color:var(--it-red); }
+.it-album-actions .it-album-tool svg { width:14px; height:14px; margin:0; fill:none; }
 .it-track-head { border-bottom-color:#e5e5e8; color:#363638; }
 .it-track-row.is-selected { background:#ffe6eb; color:#25252a; }
 .it-track-title { display:flex; align-items:center; min-width:0; }

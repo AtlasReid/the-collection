@@ -39,6 +39,8 @@ const ICONS = {
   recent:'<circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M11 6h2v6l4 2-1 2-5-3z"/>',
   video:'<rect x="3" y="5" width="13" height="14" rx="2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="m16 10 5-3v10l-5-3Z" fill="none" stroke="currentColor" stroke-width="1.6"/>',
   search:'<circle cx="10" cy="10" r="6" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="m15 15 6 6" stroke="currentColor" stroke-width="1.6"/>',
+  settings:'<path d="m10 3.5-.6 2.1-1.6.9-2.1-.5-2 3.4 1.5 1.6v1.9l-1.5 1.5 2 3.5 2.1-.5 1.6.9.6 2.2h4l.6-2.2 1.6-.9 2.1.5 2-3.5-1.5-1.5v-1.9l1.5-1.6-2-3.4-2.1.5-1.6-.9-.6-2.1Z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="1.7"/>',
+  help:'<path d="M9 7.7a3 3 0 0 1 5.9.8c0 2.2-3 2.5-3 4.7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="17.4" r="1" fill="currentColor"/>',
 };
 const icon = name => `<svg viewBox="0 0 24 24" aria-hidden="true">${ICONS[name]||''}</svg>`;
 const formatTime = value => `${Math.floor(Math.max(0,value)/60)}:${String(Math.floor(Math.max(0,value)%60)).padStart(2,'0')}`;
@@ -158,7 +160,7 @@ export function createPlayer(root,{albums=[],onEject=()=>{},onNotice=()=>{},onLi
   button('disc').before(make('p','','Store'),source('store','iTunes Store','store'));
   button('disc').before([...nav.querySelectorAll('p')].find(node=>node.textContent==='Devices'));
   const tools=make('div','it-window-tools');
-  for(const [action,label,text]of [['settings','Import settings','⚙'],['help','Music Help','?']]){const control=make('button','',text);control.type='button';control.dataset.action=action;control.setAttribute('aria-label',label);control.title=label;tools.append(control);}titlebar.append(tools);
+  for(const [action,label]of [['settings','Import settings'],['help','Music Help']]){const control=make('button','it-window-tool');control.innerHTML=icon(action);control.type='button';control.dataset.action=action;control.setAttribute('aria-label',label);control.title=label;tools.append(control);}titlebar.append(tools);
   const actions=find('.it-album-actions');
   const appleMusicLink=make('a','it-silver-button it-apple-music-link','Apple Music');appleMusicLink.target='_blank';appleMusicLink.rel='noopener noreferrer';appleMusicLink.hidden=true;actions.prepend(appleMusicLink);
   const playbackNote=make('p','it-album-playback-note');playbackNote.hidden=true;find('.it-album-text').append(playbackNote);
@@ -741,12 +743,38 @@ export function createPlayer(root,{albums=[],onEject=()=>{},onNotice=()=>{},onLi
   }
   function outside(event){if(menu&&!menu.contains(event.target)&&event.target!==menuTrigger&&!menuTrigger?.contains(event.target))closeMenu(false);}
   function contextmenu(event){const row=event.target.closest('.it-track-row');if(!row)return;event.preventDefault();trackMenu(row.querySelector('.it-row-more'),Number(row.dataset.index));}
+  function refreshFromStorage(){
+    if(destroyed)return false;
+    const libraryUpdated=library.refreshFromStorage(),interfaceUpdated=preferences.refreshFromStorage();
+    if(!libraryUpdated&&!interfaceUpdated)return false;
+    // Refresh saved data without rebuilding the desktop, transport or provider
+    // frame. Queue, selected song, import progress and checked rows stay local.
+    const active=document.activeElement,row=active?.closest?.('.it-track-row');
+    const focus=row&&root.contains(row)?{albumId:row.dataset.albumId,trackId:row.dataset.trackId,
+      selector:active.matches('.it-track-check')?'.it-track-check':active.matches('.it-song-button')?'.it-song-button':active.matches('.it-row-more')?'.it-row-more':null}:null;
+    const scrolling=[...root.querySelectorAll('.it-main,.it-track-list,.it-library-view,.it-library-grid,.it-browse-view,.it-artist-view')].map(node=>[node,node.scrollLeft,node.scrollTop]);
+    render();
+    for(const [node,left,top]of scrolling){node.scrollLeft=left;node.scrollTop=top;}
+    if(focus?.selector&&!active.isConnected){
+      const replacement=[...list.children].find(item=>item.dataset.albumId===focus.albumId&&item.dataset.trackId===focus.trackId);
+      replacement?.querySelector(focus.selector)?.focus({preventScroll:true});
+    }
+    if(libraryUpdated)libraryChanged();
+    return true;
+  }
+  // Always read through the supplied adapter: the standalone preview maps the
+  // same store API into its own keys. Ignore delayed event.newValue snapshots.
+  const storageChanged=()=>refreshFromStorage();
+  const pageShown=event=>{if(event.persisted)refreshFromStorage();};
+  const storageEvents=document.defaultView||globalThis;
+  storageEvents.addEventListener?.('storage',storageChanged);
+  storageEvents.addEventListener?.('pageshow',pageShown);
   const activityControl=make('button','it-text-button','Activity');activityControl.type='button';activityControl.dataset.action='activity';activityControl.setAttribute('aria-label','Show import activity');find('.it-side-status').append(activityControl);
   root.addEventListener('click',click);root.addEventListener('input',input);root.addEventListener('keydown',keydown);root.addEventListener('contextmenu',contextmenu);document.addEventListener('pointerdown',outside);render();
   return {
-    loadAlbum,clear,showLibrary,requestEject,command:desktopCommand,showWindow:()=>musicControl.raise(),showDisc:()=>{if(inserted){view='disc';displayAlbum=inserted;search.value='';render();musicControl.raise();}},closeWindow,minimizeWindow:()=>musicControl.minimize(),
+    loadAlbum,clear,showLibrary,requestEject,refreshFromStorage,command:desktopCommand,showWindow:()=>musicControl.raise(),showDisc:()=>{if(inserted){view='disc';displayAlbum=inserted;search.value='';render();musicControl.raise();}},closeWindow,minimizeWindow:()=>musicControl.minimize(),
     get hasLibrary(){return savedAlbums().length>0;},
     get state(){return {albumId:displayAlbum?.id||null,discAlbumId:inserted?.id||null,view,trackId:activeItem()?.track.id||null,playing,importing:Boolean(importJob),elapsed,checkedCount:checkedTracks.size,shuffle,repeat,embedTrackId,windowState:musicControl.state,importedAlbums:library.records(),persistent:library.persistent};},
-    destroy(){destroyed=true;desktopMenu?.destroy();systemSettings?.destroy();desktopPanels.destroy();closeDialog(false);help.destroy();dialogs.destroy();stopPlaybackTimer();cancelImport(false);closeEmbed();closeBandcamp();bandcampWindow.destroy();soundcloudWindow.destroy();switcher.remove();musicControl.destroy();windows.destroy();root.removeEventListener('click',click);root.removeEventListener('input',input);root.removeEventListener('keydown',keydown);root.removeEventListener('contextmenu',contextmenu);document.removeEventListener('pointerdown',outside);},
+    destroy(){destroyed=true;storageEvents.removeEventListener?.('storage',storageChanged);storageEvents.removeEventListener?.('pageshow',pageShown);desktopMenu?.destroy();systemSettings?.destroy();desktopPanels.destroy();closeDialog(false);help.destroy();dialogs.destroy();stopPlaybackTimer();cancelImport(false);closeEmbed();closeBandcamp();bandcampWindow.destroy();soundcloudWindow.destroy();switcher.remove();musicControl.destroy();windows.destroy();root.removeEventListener('click',click);root.removeEventListener('input',input);root.removeEventListener('keydown',keydown);root.removeEventListener('contextmenu',contextmenu);document.removeEventListener('pointerdown',outside);},
   };
 }

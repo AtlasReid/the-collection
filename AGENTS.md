@@ -2,12 +2,18 @@
 
 Read `README.md`, `docs/CONTINUING.md` and `docs/ASSETS.md`. This checkout is self-contained. Use Node.js 20+: `node server.mjs` previews on port 4319; `node checks/run-checks.mjs` runs the complete checks. No install or build is needed. Preserve relative runtime URLs, repository-prefix hosting and `.nojekyll`.
 
+## Application structure
+
+- `index.html` loads the JavaScript scene directly through `scene.js`. Keep the site usable on static hosting with no compilation or package installation required for ordinary preview.
+- Use one Music implementation for the 3D laptop and standalone desktop preview. Keep catalogue IDs, artwork, browser storage schemas and original interface content stable.
+
 ## Shared interface
 
-- `music/player.js` and its modules serve the 3D laptop and `dev/music/` desktop preview. Change shared behaviour there; do not fork the player.
+- `music/player.js` and its modules are the single source for the 3D laptop and the `dev/music/` desktop preview. Preserve the original JavaScript layouts, wording, jokes, Help articles and interactions by changing this shared implementation, never a second copy.
 - The interface is an unofficial, playful macOS/Music study. Menu, account, power and subscription commands stay inside the prototype; never operate the real computer or its Music library. Preserve factual provider/licence copy. Services under Music is disabled.
-- Preserve the managed Music window, real close/minimise/maximise, dock recovery, Help and virtual TextEdit acknowledgements. Close stops playback; minimise preserves it. Keep stable SVG control nodes through playback updates.
-- Apple → System Settings and the Graphics drawer share the same validated settings store. Music Settings remains separate. Dispose subscriptions and merge cross-tab changes from fresh storage reads.
+- About, Help, dialogs, menus and settings come from the same JavaScript modules in the 3D and standalone desktop views. Preserve their shared CSS structures, original illustrations, Help toolbar, disclosure hierarchy, search/history and focus restoration.
+- Preserve the managed Music window, real close/minimise/maximise, dock recovery, Help and virtual TextEdit acknowledgements. Close stops playback; minimise preserves it. Keep stable, centred SVG control nodes through playback updates; avoid font glyphs for title-bar symbols. SoundCloud uses a 166 px compact media frame; clamp managed windows after desktop size changes without replacing provider frames.
+- Apple → System Settings and the Graphics drawer share the validated `graphics-settings.js` preference store and controls. Music Settings remains separate. Dispose subscriptions and merge cross-tab changes from fresh storage reads. Music library/interface mutations must preserve unknown catalogue IDs and newer storage versions, and live refresh must retain playback, imports and provider frames.
 - Move the entire `screen-desktop` between laptop and compact dialog, retaining player/windows/iframes. Native close-up uses the same DOM without a perspective bitmap; tilted views use the exact homography. Logical widths are 1024 Comfortable / 1280 Compact, separate from backing resolution and devicePixelRatio.
 - In desk mode, keep the projected desktop inert. The screen-wide accessible entry button opens the same desktop without reopening closed Music; dragging still orbits. Enable desktop controls after the focus flight settles or inside the compact dialog. Preserve foreground input occlusion and keyboard entry.
 
@@ -21,6 +27,7 @@ Read `README.md`, `docs/CONTINUING.md` and `docs/ASSETS.md`. This checkout is se
 - Hardware display top corners are circular .045-unit arcs; bottom corners are square. The aperture clones that contour at screen-local z=.0002. The camera lens radius is .016 with 24 segments. Preserve the common physical scale: 120 mm CDs, 15 mm open holes and 1.2 mm substrate.
 - CD covers fill the circular upper face using centred square-to-circle UVs with only 0.35 mm radial margins. Reuse the case texture; do not restore broad reflective sectors or a small central label. Preserve the silver underside and actual hole, case opening and unobstructed insertion path.
 - Preserve the centred laptop/drive/rack/case composition, +12° laptop yaw and attached USB parts. `fitDeskOrbit` uses .82 of conservative framing distance with a 1.035-padded composition clamp. Manual zoom limits use the conservative radius. Keep the home target stable, recenter normal desk endpoints and preserve displayed pan on interrupted return flights.
+- Keep the USB-A adapter housing grounded, both plug housings within 1 mm of their mating faces, and the metal plugs seated inside their sockets. Derive strain-relief and cable endpoints from the housing tails after laptop yaw.
 - Keep eased focus/return timing 1015/875 ms and 80 ms preparation, delivered-frame clock and reduced motion. Hide screen pills during movement and restore normal size after settlement. Keep Open Music hover/focus reveal, Back to desk and compact fallback. A stationary press starting and ending outside the focused laptop (or compact dialog) returns to the desk; bezel/desktop/padding clicks and drags stay inside. Ignore backdrop return during camera flights.
 - Avoid competing nearly coplanar draw surfaces: case artwork is the paper insert's sole front face; retain its solid reverse and edges. Keep isolated notch/lens depth offsets ahead of the display aperture without changing physical contours, shared bezel material or foreground occlusion.
 - Camera input remains available during CD operations; the busy lock protects media actions and hover writes. Preserve operation ownership and staged case/disc motion.

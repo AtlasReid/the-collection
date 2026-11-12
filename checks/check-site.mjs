@@ -24,6 +24,7 @@ const origin='https://collection.invalid';
 const siteURL=new URL(prefix,origin);
 const resources=new Set();
 const retiredCompatibilityFiles=['music/index.html','music/music.js','music/music.css','music/assets/blade-front.png','music/assets/superdrive-front.png'];
+const retiredBuildFiles=['boot.js','build-controls.js','build-preferences.js','music/shared-desktop.js','swift/main.js','swift/runtime/index.js','swift/runtime/CollectionApp.wasm','scripts/build-swift.mjs','scripts/wasm-artifact.mjs','checks/check-swift.mjs','checks/swift-scene-math.swift'];
 const texts=new Map();
 const tests=[];
 const test=(name,run)=>tests.push({name,run});
@@ -124,6 +125,10 @@ test('the main entry uses The Collection and omits the removed presentation',asy
   const text=await source('index.html');
   assert.match(text,/<title>The Collection<\/title>/);
   assert.match(text,/<h1>The Collection<\/h1>/);
+  const scripts=documentElements(text).filter(element=>element.tag==='script');
+  assert.deepEqual(scripts.map(element=>element.attributes.src),['./scene.js'],'The website must load its single JavaScript scene directly');
+  assert.equal(scripts[0].attributes.type,'module');
+  assert.doesNotMatch(text,/data-app-build|(?:boot|build-controls|build-preferences)\.js|swift\/runtime/,'The entry must not select or load an alternate build');
   assert.doesNotMatch(text,/Good music\.|Physical copies\.|THE LISTENING DESK|id=["'](?:show-references|reference-dialog)["']|class=["'](?:eyebrow|prototype-note)["']/);
   assert.doesNotMatch(await source('scene.js'),/\$\(['"]#(?:show-references|reference-dialog|close-references)['"]\)/);
 });
@@ -178,6 +183,9 @@ test('HTML links, styles and the complete static module graph stay inside the ch
   assert.ok(resources.has('vendor/three/three.core.js'),'Vendored Three.js core dependency is absent');
   assert.ok(resources.has('music/catalogue.js'),'The shared real collection is absent');
   assert.equal(resources.has('music/collection.js'),false,'Archived demo fixtures must not enter the production graph');
+  assert.ok(resources.has('scene.js'),'The JavaScript scene is absent');
+  assert.ok(resources.has('music/player.js'),'The scene must retain the original Music desktop');
+  for(const relative of retiredBuildFiles)assert.equal(resources.has(relative),false,`Retired build resource remains reachable: ${relative}`);
 });
 
 test('the requested nine full catalogues replace demos without sharing track identifiers',()=>{
@@ -380,8 +388,8 @@ test('replacing demo cases preserves existing real imports, preferences and the 
   for(const [key,value]of before)if(![libraryKey,interfaceKey].includes(key))assert.equal(entries.get(key),value,`Unrelated record changed: ${key}`);
 });
 
-test('retired compatibility files are absent while the vendored licence remains packaged',async()=>{
-  for(const relative of retiredCompatibilityFiles)await assert.rejects(stat(file(relative)),{code:'ENOENT'},`Retired compatibility file remains packaged: ${relative}`);
+test('retired presentation and build files are absent while the vendored licence remains packaged',async()=>{
+  for(const relative of [...retiredCompatibilityFiles,...retiredBuildFiles])await assert.rejects(stat(file(relative)),{code:'ENOENT'},`Retired file remains packaged: ${relative}`);
   await exactFile('vendor/three/LICENSE');
   assert.match(await source('vendor/three/LICENSE'),/The MIT License/);
   await exactFile('.nojekyll');
@@ -430,8 +438,8 @@ test('the real preview server redirects root and the bare repository prefix',asy
   }
 });
 
-test('nested root and desktop routes return the actual entry pages',async()=>{
-  for(const [url,relative]of [[prefix,'index.html'],[`${prefix}dev/music/`,'dev/music/index.html']]) {
+test('nested root, legacy build links and desktop routes return the actual entry pages',async()=>{
+  for(const [url,relative]of [[prefix,'index.html'],[`${prefix}?build=swift`,'index.html'],[`${prefix}?build=javascript`,'index.html'],[`${prefix}dev/music/`,'dev/music/index.html']]) {
     const result=await request(url);
     assert.equal(result.status,200,url);
     assert.match(result.headers['content-type'],/^text\/html/);
@@ -463,7 +471,7 @@ test('HEAD preserves resource headers and unsupported write methods are rejected
 });
 
 test('retired files, missing resources and routes outside the configured prefix cannot alias the app',async()=>{
-  for(const rawPath of ['/index.html','/other-site/',`${prefix}missing-file.js`,`${prefix}music/`,...retiredCompatibilityFiles.map(relative=>`${prefix}${relative}`)]) {
+  for(const rawPath of ['/index.html','/other-site/',`${prefix}missing-file.js`,`${prefix}music/`,...[...retiredCompatibilityFiles,...retiredBuildFiles].map(relative=>`${prefix}${relative}`)]) {
     assert.equal((await request(rawPath)).status,404,rawPath);
   }
 });

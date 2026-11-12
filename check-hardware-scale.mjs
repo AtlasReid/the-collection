@@ -62,6 +62,20 @@ function meshBounds(mesh, relativeTo = null) {
   }
   return mesh.geometry.boundingBox.clone().applyMatrix4(transform);
 }
+function axialBounds(mesh, origin, axis) {
+  mesh.updateWorldMatrix(true, false);
+  const positions = mesh.geometry.getAttribute('position'), point = new THREE.Vector3();
+  let min = Infinity, max = -Infinity;
+  for (let index = 0; index < positions.count; index++) {
+    const distance = point.fromBufferAttribute(positions, index).applyMatrix4(mesh.matrixWorld).sub(origin).dot(axis);
+    min = Math.min(min, distance); max = Math.max(max, distance);
+  }
+  return { min, max };
+}
+function axisEnd(mesh, axis, end) {
+  const centre = mesh.getWorldPosition(new THREE.Vector3());
+  return centre.clone().addScaledVector(axis, axialBounds(mesh, centre, axis)[end]);
+}
 function groupLocalBounds(group) {
   group.updateWorldMatrix(true, true);
   const bounds = new THREE.Box3();
@@ -171,9 +185,10 @@ test('the turned Air keeps its USB-C marker and rigid adapter parts aligned with
   near(marker.distanceTo(portCentre), 0, EPS, 'USB-C marker at actual port');
   const tip = named(hardware.cable, 'USB-C connector at MacBook Air');
   const offset = tip.getWorldPosition(new THREE.Vector3()).sub(portCentre);
-  assert.ok(offset.dot(outward) > 0, 'the connector must extend out of the port');
+  const tipDepth = axialBounds(tip, portCentre, outward);
+  assert.ok(tipDepth.min < 0 && tipDepth.max > 0, 'the connector must enter the port while retaining a visible outer seam');
   near(offset.clone().cross(outward).length(), 0, EPS, 'connector centre follows the port normal');
-  for (const name of ['White USB-A plug body', 'SuperDrive USB-A plug shell at adapter', 'USB-C to USB-A adapter body', 'USB-A adapter socket', 'USB-C connector at MacBook Air', 'White USB-C connector']) {
+  for (const name of ['White USB-A plug body', 'SuperDrive USB-A plug shell at adapter', 'USB-C to USB-A adapter body', 'USB-A adapter socket', 'USB-C connector at MacBook Air', 'White USB-C connector', 'USB-C strain relief', 'USB-A adapter strain relief']) {
     const connector = named(hardware.cable, name);
     const axis = new THREE.Vector3(-1, 0, 0).transformDirection(connector.matrixWorld);
     near(axis.distanceTo(outward), 0, EPS, `${name} follows the port orientation`);
@@ -181,6 +196,44 @@ test('the turned Air keeps its USB-C marker and rigid adapter parts aligned with
   const socket = named(hardware.cable, 'USB-A adapter socket');
   const socketMarker = hardware.group.localToWorld(new THREE.Vector3().fromArray(hardware.cable.userData.adapterSocket));
   near(socket.getWorldPosition(new THREE.Vector3()).distanceTo(socketMarker), 0, EPS, 'USB-A socket marker');
+});
+
+test('the adapter rests on the table and both plugs are seated with only a small visible seam', () => {
+  const body = named(hardware.cable, 'USB-C to USB-A adapter body');
+  const bottom = meshBounds(body).min.y;
+  assert.ok(bottom >= -EPS && bottom <= mm(.25), 'the female housing must touch the table without penetrating it');
+  const port = named(hardware.laptop, 'Front USB-C recess');
+  const outward = new THREE.Vector3(0, 0, 1).transformDirection(port.matrixWorld);
+  for (const [label, origin, housingName, metalName] of [
+    ['USB-C', port.getWorldPosition(new THREE.Vector3()), 'White USB-C connector', 'USB-C connector at MacBook Air'],
+    ['USB-A', named(hardware.cable, 'USB-A adapter socket').getWorldPosition(new THREE.Vector3()), 'White USB-A plug body', 'SuperDrive USB-A plug shell at adapter'],
+  ]) {
+    const housing = axialBounds(named(hardware.cable, housingName), origin, outward);
+    const metal = axialBounds(named(hardware.cable, metalName), origin, outward);
+    assert.ok(housing.min >= -EPS && housing.min <= mm(1), `${label} white housing must sit close to the mating face`);
+    assert.ok(metal.min < -mm(1), `${label} metal must insert into the mating socket`);
+    assert.ok(metal.max > housing.min && metal.max < housing.max, `${label} metal must meet its own white housing without an exposed rear gap`);
+  }
+});
+
+test('adapter strain reliefs and both flexible cables meet the actual housing ends', () => {
+  const port = named(hardware.laptop, 'Front USB-C recess');
+  const outward = new THREE.Vector3(0, 0, 1).transformDirection(port.matrixWorld);
+  const head = named(hardware.cable, 'White USB-C connector');
+  const body = named(hardware.cable, 'USB-C to USB-A adapter body');
+  const plug = named(hardware.cable, 'White USB-A plug body');
+  const cRelief = named(hardware.cable, 'USB-C strain relief');
+  const aRelief = named(hardware.cable, 'USB-A adapter strain relief');
+  near(axisEnd(cRelief, outward, 'min').distanceTo(axisEnd(head, outward, 'max')), 0, EPS, 'USB-C housing/strain-relief contact');
+  near(axisEnd(aRelief, outward, 'max').distanceTo(axisEnd(body, outward, 'min')), 0, EPS, 'female housing/strain-relief contact');
+  const lead = named(hardware.cable, 'Short USB-C adapter lead');
+  const leadStart = lead.localToWorld(lead.geometry.parameters.path.getPoint(0));
+  const leadEnd = lead.localToWorld(lead.geometry.parameters.path.getPoint(1));
+  near(leadStart.distanceTo(axisEnd(cRelief, outward, 'max')), 0, EPS, 'adapter lead starts inside the USB-C relief');
+  near(leadEnd.distanceTo(axisEnd(aRelief, outward, 'min')), 0, EPS, 'adapter lead ends inside the female relief');
+  const cord = named(hardware.cable, 'Flexible fixed USB cord');
+  const cordEnd = cord.localToWorld(cord.geometry.parameters.path.getPoint(1));
+  near(cordEnd.distanceTo(axisEnd(plug, outward, 'max')), 0, EPS, 'SuperDrive cord meets the USB-A plug tail');
 });
 
 test('every actual CD edge has a 120 mm diameter, 15 mm hole and 1.2 mm substrate', () => {

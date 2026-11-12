@@ -1,6 +1,6 @@
 # Assets and sources
 
-Updated 9 November 2026. This record covers the packaged assets, their public sources and their rights limits.
+Updated 12 November 2026. This record covers the packaged assets, their public sources and their rights limits.
 
 The shared collection contains **nine real album catalogues and 324 track entries**: six SoundCloud snapshots, two Bandcamp snapshots and one Apple Music catalogue with partial SoundCloud matches. The 3D desk and standalone desktop use the same list. Album artwork is reused on case inserts, full-face circular disc prints and the desktop CD icon. These are album-art visualisations, not scans or verified reproductions of physical CD labels. No audio was downloaded.
 
@@ -26,6 +26,7 @@ The shared collection contains **nine real album catalogues and 324 track entrie
 | `../music/soundcloud-dermot-album.js`, `../music/assets/covers/dermot-trees.jpg` | Four verified public track records for the user's Dermot Kennedy album and its official 500×500, 88,216-byte JPG cover, shared by the 3D and standalone previews. Third-party artwork, not an original or open-licensed asset. |
 | `../music/scottish-bagpipe-album.js`, `../music/assets/covers/scottish-bagpipe-collection.jpg` | Complete 35-track public Apple Music catalogue checked 8 November 2026; five per-track SoundCloud performer/title/duration matches from another compilation. Official Apple-hosted 600×600 JPG cover, 119,719 bytes. Music/artwork remain third-party material; no separate redistribution licence has been established. |
 | `../music/catalogue.js`, `../music/scene-catalogue.js` | Shared composition of the nine album catalogues above. The six demo fixtures and Forss diagnostic are outside the visible collection. |
+| `../music/player.js` and desktop modules | Original project interface shared by the 3D laptop and standalone desktop preview, including Music windows, menu explanations, Help articles, settings and the acknowledgements viewer. CSS, wallpaper, illustrations and album artwork retain their sources and rights recorded here. |
 | `../music/soundcloud-diagnostic.js` | Preview-only metadata for Forss's Flickermood (SoundCloud ID 293), the official Widget API example. Uses the existing original disc icon rather than copying its cover. |
 | `../music/bandcamp-album.js`, `../music/assets/covers/momento.jpg` | Seven public Momento track records and the artist's official 700×700, 79,392-byte JPG cover, obtained from Dave Milligan's Bandcamp album page on 8 November 2026. Third-party, all-rights-reserved material; no audio or stream URLs are stored. The cover is reused by the 3D case/disc, desktop icon and Music preview. |
 | `../music/soundcloud-portraits-album.js`, `../music/assets/covers/portraits.jpg` | All 11 Portraits tracks from Simon Thoumire's public SoundCloud mobile metadata, checked 8 November 2026. Joint artist credit is confirmed by the official Bandcamp album. Official 500×500 JPG cover: 62,939 bytes. Third-party artwork and metadata retain their respective owners' rights. |

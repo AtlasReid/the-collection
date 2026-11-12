@@ -1,6 +1,6 @@
 # The Collection v1.0.0 — continuation notes
 
-Updated 9 November 2026, following the v1.0.0 release. Read [README](../README.md), [AGENTS](../AGENTS.md) and [asset provenance](ASSETS.md) before changing the project. This checkout contains the continuing source; no private workspace, chat or reference archive is required.
+Updated 12 November 2026, following the v1.0.0 release. Read [README](../README.md), [AGENTS](../AGENTS.md) and [asset provenance](ASSETS.md) before changing the project. This checkout contains the continuing source; no private workspace, chat or reference archive is required.
 
 ## Run and entry points
 
@@ -13,11 +13,17 @@ node checks/run-checks.mjs
 
 Open `http://127.0.0.1:4319/`. The server also supports `BASE_PATH=/the-collection/` for repository-prefix checks. Keep runtime URLs relative; use HTTP rather than `file://`.
 
-- `index.html`, `scene.js`, `scene.css`: active WebGL listening desk. If WebGL is unavailable, the fallback links to the desktop preview. The retired CSS/photo view and its two product photographs are removed.
-- `dev/music/index.html`: desktop-only development view, also available through Graphics → Desktop only. It uses the same `music/player.js` / `player.css`; do not fork the player. `?album=momento`, `?album=the-complete-scottish-bagpipe-collection` and `?album=none` select preview states.
+- `index.html`, `scene.js`, `scene.css`: active JavaScript/WebGL listening desk. The page loads `scene.js` directly; no build selector or compiled application runtime is required. If WebGL is unavailable, the fallback links to the desktop preview. The retired CSS/photo view and its two product photographs are removed.
+- `dev/music/index.html`: desktop-only development view, also available through Graphics → Desktop only. It uses the same `music/player.js` / `player.css` as the 3D laptop; do not fork the player. `?album=momento`, `?album=the-complete-scottish-bagpipe-collection` and `?album=none` select preview states.
 - `hardware.js`, `macbook-air.js`, `superdrive.js`, `discs.js`, `cd-shelf.js`, `case-journey.js`: procedural hardware, real case opening and staged CD movement; `physical-scale.js` owns common dimensions.
 - `projection.js`, `screen-aperture.js`, `camera-fit.js`, `camera-flight.js`, `display-quality.js`: desktop mapping, occlusion, framing, viewport transitions and native close-up sizing.
-- `music/`: shared library, provider transports/windows, draggable Music, nested menus, Help and local panels. Graphics and virtual System Settings share `graphics-settings.js`'s preference store and field controls.
+- `music/`: one shared desktop implementation for the 3D laptop and standalone preview: library state, provider transports/windows, draggable Music, nested menus, Help, jokes and panels. `scene.js` mounts `music/player.js` directly. Graphics and virtual System Settings share `graphics-settings.js`'s preference store, drawer and field controls.
+
+## Shared desktop
+
+`music/player.js`, `desktop-menu.js`, `desktop-panels.js`, `help-viewer.js`, `dialogs.js`, `system-settings.js`, window modules and their CSS are the canonical interface for the 3D laptop and desktop preview. Keep About windows, nested menu explanations, Help search/history, acknowledgements, traffic lights, dock recovery and provider notices in these shared modules.
+
+The Graphics drawer and System Settings use one validated preference store. Music Settings remains a visit-only simulation; Import Settings saves catalogue-flow choices, never encoded audio. Desktop changes must retain live provider frames and imports rather than remount the player.
 
 ## Current catalogue
 
@@ -47,7 +53,7 @@ The six invented albums in `music/collection.js` and their SVG covers remain arc
 | `atlasreid-music-ui-preview-interface-v1` | Separate desktop-preview interface state |
 | `atlasreid-collection-graphics-v1` | Six validated graphics preferences shared across presentations/tabs |
 
-Import saves catalogue entries, never audio or unfinished progress. Keep existing IDs/keys and hidden archived records; never clear unrelated storage. Preview reset clears only its two preview keys. Origins/browser profiles have separate libraries; Git does not transfer them. Storage failures fall back to the current visit. Graphics patches merge fresh persisted state; subscriptions and cross-tab listeners must be disposed.
+Import saves catalogue entries, never audio or unfinished progress. Keep existing IDs/keys and hidden archived records; never clear unrelated storage. Preview reset clears only its two preview keys. Origins/browser profiles have separate libraries; Git does not transfer them. Storage failures fall back to the current visit. Music mutations merge fresh saved data while retaining failed local writes, unknown catalogue IDs and future-version records. Open desktop views refresh saved entries and preferences from storage without resetting playback, active imports or provider frames. Graphics patches merge fresh persisted state; subscriptions and cross-tab listeners must be disposed. Retired build preferences are ignored; do not clear unrelated browser storage.
 
 ## Interaction and rendering contracts
 
@@ -68,6 +74,7 @@ Import saves catalogue entries, never audio or unfinished progress. Keep existin
 
 - Common scale: 4.05 units per 304.1 mm. Air footprint 304.1×215 mm, with an 11.3 mm closed-assembly reference; SuperDrive 139×139×17 mm; representative jewel cases 142×125 mm. Enclosure details/cable length are visual estimates; measure laptop footprints locally after yaw.
 - Laptop yaw is +12° Y, anticlockwise from above; transform USB-C attachment, direction and rigid adapter parts with it. Preserve drive/slot placement, staged shelf clearance and table-case hover/return.
+- The USB-A adapter housing rests on the table; USB-C and USB-A plugs insert into their mating openings with submillimetre white-housing seams. Rounded white housings and strain reliefs follow the supplied visual reference; connector dimensions remain estimates. Cable endpoints follow the actual housing/relief ends after yaw.
 - Separate visible composition from conservative cable/CD-journey bounds. Perspective horizontal centering uses a stable base target; `fitDeskOrbit` chooses 0.82 of the conservative distance, clamped by a 1.035-padded visible fit. Manual zoom limits stay 0.62–1.4 of the conservative radius. Preserve displayed pan when interrupting a return flight until Reset view.
 - Display aspect is 2560:1664. Upper corners are circular radius .045; lower corners remain square. Webcam radius .016 with 24 segments stays inside the notch. The cloned aperture and DOM projection share screen-local depth .0002 and source dimensions.
 - Notch/lens use isolated, ordered polygon depth offsets to avoid display-aperture flicker at oblique distances; physical contour and input occlusion remain unchanged. Printed case artwork is the paper insert's only front face, with solid reverse/edges retained, avoiding nearly coplanar backing flicker through lid motion.
@@ -85,12 +92,12 @@ The bagpipe album's five SoundCloud entries match performer/title/duration from 
 
 ## Verification and remaining limits
 
-The current checkout passes **209 checks across 20 suites**, including **19 site checks and 78 served runtime resources** under a repository prefix; syntax and whitespace checks pass. The retired view and product-photo URLs return 404; the desktop preview is the WebGL-independent fallback. Geometry tests cover current hardware, nine-case separation/journeys, projection/aperture contours, full-face artwork and fit across aspect ratios. Case regression rays check all nine printed fronts and their reverse through lid motion; aperture checks retain physical foreground occlusion with isolated notch/lens depth bias. Numerical checks are not GPU or physical-touch proof.
+The 12 November simplification restores one JavaScript application while retaining the grounded/seated USB adapter, screen-wide click/tap and keyboard desktop entry, outside-click return, original Music/Help content, centred SVG controls and saved-library improvements. **All 20 check suites pass**, including **14 hardware scale checks**, **17 graphics settings checks**, **16 import-library checks**, **14 interface-state checks**, and **19 standalone site checks over 78 runtime files**. Direct scene startup, repository-prefix hosting, retired runtime URLs returning 404, legacy build links serving the normal entry, syntax and whitespace checks pass. Browser QA verified direct `scene.js` startup, no Build controls in Graphics or System Settings, existing 1920/Compact display preferences retained, screen-click and keyboard entry, outside-click return and a closed Music window remaining closed on re-entry. Physical-touch and audible-output verification remain separate.
 
-Browser QA covered nine centred cases/buttons, panel collapse/skip link/Graphics focus and scrolling, native close-up/compact restoration, credits at desktop and narrow widths, full-face CD artwork and unchanged saved libraries. Bagpipe Amazing Grace advanced to 26 seconds in SoundCloud and paused; switching to unmatched Flower of Scotland unloaded the frame and opened the correct external options without progress. Playback was stopped afterward; no imports were saved during that pass.
+The retained library checks cover fresh-storage merges, late-arriving future schemas, unknown IDs, failed-write recovery and preview namespace isolation. Window/transport checks preserve iframe identity, close/minimise/maximise behaviour and media state. Geometry contracts cover the hardware, seated adapters and cable joins, nine-case separation/journeys, projection/aperture contours, full-face artwork and composition fit. Preserve on-demand rendering and the embedded-browser compositing workaround. Numerical checks are not GPU or physical-touch proof.
 
-Wallpaper/entry QA verified the supplied JPEG unchanged, desktop click and Enter/Space entry, screen drags remaining in desk mode, closed Music staying closed, and 390 px compact entry/return restoring the same desktop and inert state. Outside clicks returned from both focused and compact modes; focused backdrop drags, bezel clicks, compact padding clicks and Music controls stayed inside. Browser views at close zoom and opposite oblique angles showed clean notch/case surfaces after the depth fixes. Physical-touch input remains unverified.
+Earlier desktop QA verified the original Help welcome, subscription articles, search/history and Escape/focus restoration, Music Settings tabs, disabled Services, About Music and the virtual TextEdit acknowledgements. Bandcamp remained loaded when Music was minimised and unloaded on provider close. Current phone-size layout still needs a browser pass; the last in-app viewport attempt stayed at 747 px instead of the requested 390 px, and its temporary override was reset.
 
-Observed provider checks also include Bandcamp's Going Nowhere advancing in its native player with background preservation and Stop/unload, and Chrome playback of Dermot Kennedy's Two Hearts/Lessons and Clair Obscur's Alicia. Those SoundCloud examples stalled in the in-app browser even though Forss and the tested bagpipe recording worked. Do not generalise a working track to an entire catalogue or browser. Physical-phone/touch, exhaustive interruption/reduced-motion combinations and full assistive-technology coverage remain incompletely verified.
+Earlier provider checks found that some SoundCloud tracks worked in Chrome but stalled in the in-app browser. Do not generalise one working track to an entire catalogue or browser. Physical-phone/touch, exhaustive interruption/reduced-motion combinations and full assistive-technology coverage remain incompletely verified.
 
 Preserve [credits and notices](../credits.html), [asset provenance](ASSETS.md), the complete bundled Three.js MIT licence and [downloadable acknowledgements](../music/acknowledgements.rtf). No open-source licence has been selected for the application/original assets. Attribution, source availability and embedded players do not establish publication permission for third-party music, artwork, photographs or marks. Inspect Git/hosting state separately; source publication does not itself enable Pages or change domain/DNS configuration.

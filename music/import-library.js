@@ -19,6 +19,9 @@ export function createImportLibrary(options = {}) {
   let futureVersion = false;
   let doNotAsk = false;
   let lastIssuedTime = 0;
+  let readable = false;
+  const pendingAlbums = new Map();
+  let pendingDoNotAsk;
 
   function registerAlbum(album) {
     if (!isRecord(album) || !validId(album.id) || !Array.isArray(album.tracks)) return false;
@@ -50,28 +53,46 @@ export function createImportLibrary(options = {}) {
     });
   }
 
-  // Access the browser property here rather than at module import: private
-  // browsing, storage policy and test environments can throw even on access.
+  // Retain failed local writes separately, so refreshing another tab's saved
+  // entries cannot either erase them or replay old, already-committed choices.
+  function refreshFromStorage() {
+    const before = JSON.stringify([records(),doNotAsk,persistent]);
+    readable = false;
+    try {
+      if (!storage) throw new Error('Storage unavailable');
+      const text = storage.getItem(MUSIC_LIBRARY_KEY);
+      readable = true;
+      let saved = null;
+      if (text !== null && text !== undefined) {
+        if (typeof text !== 'string' || text.length > MAX_BYTES) {
+          readable = false;
+          throw new Error('Invalid mock library size');
+        }
+        futureVersion = false;
+        saved = JSON.parse(text);
+        futureVersion = isRecord(saved) && Number.isInteger(saved.version) && saved.version > VERSION;
+        if (!isRecord(saved) || saved.version !== VERSION) throw new Error('Unsupported mock library version');
+      } else futureVersion = false;
+      candidates.clear();
+      doNotAsk = saved?.doNotAsk === true;
+      if (Array.isArray(saved?.albums)) for (const record of saved.albums.slice(0, MAX_ALBUMS)) readRecord(record);
+      persistent = true;
+    } catch {
+      persistent = false;
+    }
+    for (const [albumId,record] of pendingAlbums) readRecord({albumId,...record});
+    if (pendingDoNotAsk !== undefined) doNotAsk = pendingDoNotAsk;
+    if (pendingAlbums.size || pendingDoNotAsk !== undefined) persistent = false;
+    return before !== JSON.stringify([records(),doNotAsk,persistent]);
+  }
+
+  // Access this property only during construction; browsers can deny even its
+  // getter. Subsequent reads use the same explicitly supplied storage adapter.
   try {
     storage = Object.prototype.hasOwnProperty.call(settings, 'storage') ? settings.storage : globalThis.localStorage;
-    if (storage && typeof storage.getItem === 'function' && typeof storage.setItem === 'function') {
-      const text = storage.getItem(MUSIC_LIBRARY_KEY);
-      persistent = true;
-      if (text !== null && text !== undefined) {
-        if (typeof text !== 'string' || text.length > MAX_BYTES) throw new Error('Invalid mock library size');
-        const saved = JSON.parse(text);
-        if (!isRecord(saved) || saved.version !== VERSION) {
-          futureVersion = isRecord(saved) && Number.isInteger(saved.version) && saved.version > VERSION;
-          persistent = false;
-        } else {
-          doNotAsk = saved.doNotAsk === true;
-          if (Array.isArray(saved.albums)) for (const record of saved.albums.slice(0, MAX_ALBUMS)) readRecord(record);
-        }
-      }
-    }
-  } catch {
-    persistent = false;
-  }
+    if (!storage || typeof storage.getItem !== 'function' || typeof storage.setItem !== 'function') storage = null;
+  } catch { storage = null; }
+  refreshFromStorage();
 
   for (const album of Array.isArray(settings.catalog) ? settings.catalog : []) registerAlbum(album);
 
@@ -90,7 +111,7 @@ export function createImportLibrary(options = {}) {
   }
 
   function persist() {
-    if (!storage || futureVersion) { persistent = false; return; }
+    if (!storage || !readable || futureVersion) { persistent = false; return; }
     try {
       // Keep syntactically valid private candidates for late registerAlbum()
       // calls. Only registered catalogue IDs can ever be read by the UI.
@@ -103,6 +124,8 @@ export function createImportLibrary(options = {}) {
       if (text.length > MAX_BYTES) throw new Error('Mock library exceeds storage size limit');
       storage.setItem(MUSIC_LIBRARY_KEY, text);
       persistent = true;
+      pendingAlbums.clear();
+      pendingDoNotAsk = undefined;
     } catch {
       persistent = false;
     }
@@ -112,22 +135,26 @@ export function createImportLibrary(options = {}) {
     const known = catalogue.get(albumId);
     if (!known || !trackIds || typeof trackIds === 'string') return false;
     const valid = new Set(known);
-    const current = candidates.get(albumId);
-    const merged = new Set(current?.trackIds || []);
-    let changed = false;
+    const requested = new Set();
     try {
       let count = 0;
       for (const id of trackIds) {
         if (++count > MAX_TRACKS) break;
-        if (valid.has(id) && !merged.has(id)) { merged.add(id); changed = true; }
+        if (valid.has(id)) requested.add(id);
       }
     } catch { return false; }
+    refreshFromStorage();
+    const current = candidates.get(albumId);
+    const merged = new Set(current?.trackIds || []);
+    let changed = false;
+    for (const id of requested) if (!merged.has(id)) { merged.add(id); changed = true; }
     if (!changed) {
       if (current && !persistent) persist();
       return false;
     }
     lastIssuedTime = Math.max(Date.now(), lastIssuedTime + 1);
     candidates.set(albumId, {trackIds: merged, importedAt: lastIssuedTime});
+    pendingAlbums.set(albumId, {trackIds:[...merged],importedAt:lastIssuedTime});
     persist();
     return true;
   }
@@ -137,8 +164,11 @@ export function createImportLibrary(options = {}) {
     tracksFor,
     records,
     remember,
+    refreshFromStorage,
     setDoNotAsk(value) {
+      refreshFromStorage();
       doNotAsk = value === true;
+      pendingDoNotAsk = doNotAsk;
       persist();
     },
     get doNotAsk() { return doNotAsk; },

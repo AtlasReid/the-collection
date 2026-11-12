@@ -112,3 +112,6 @@ body.is-player-focused .collection-panel{display:none}
 @media(max-width:600px){.collection-panel{left:max(12px,env(safe-area-inset-left));right:max(12px,env(safe-area-inset-right));bottom:calc(12px + env(safe-area-inset-bottom));padding:9px;border-radius:22px;max-height:42dvh}.collection-panel .collection-bar{margin:0 1px 4px;padding-bottom:6px}.collection-panel .collection-label{margin-left:4px;font-size:8px;letter-spacing:1px}.collection-panel .album-list{grid-template-columns:repeat(2,minmax(0,1fr));gap:3px 4px}.collection-panel .album-option{min-height:54px;padding:8px;gap:8px;border-radius:12px}.collection-panel .album-option img{width:31px;height:31px}.collection-panel .album-option strong{font-size:10px}.collection-panel .album-option small{font-size:8px}}
 @media(prefers-reduced-motion:reduce){.collection-collapse svg{transition:none}}
 @media(prefers-reduced-transparency:reduce){.collection-panel{background:#f7f8f4;-webkit-backdrop-filter:none;backdrop-filter:none}}
+
+/* Keep the laptop menus left of the physical camera notch at either UI size. */
+.screen-surface .vm-menu-trigger{min-width:24px;padding:0 6px;font-size:11px}

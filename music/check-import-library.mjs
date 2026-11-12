@@ -131,4 +131,89 @@ check('do not ask preference persists independently of album completion', () => 
   assert.equal(createImportLibrary({catalog,storage}).doNotAsk,false);
 });
 
+check('interleaved tabs merge completed tracks and preserve the newest unrelated preference', () => {
+  const storage = memory();
+  const first = createImportLibrary({catalog,storage});
+  const second = createImportLibrary({catalog,storage});
+  first.remember('one',['one-1']);
+  second.setDoNotAsk(true);
+  second.remember('two',['two-1']);
+  first.remember('one',['one-2']);
+  const restored = createImportLibrary({catalog,storage});
+  assert.deepEqual([...restored.tracksFor('one')],['one-1','one-2']);
+  assert.deepEqual([...restored.tracksFor('two')],['two-1']);
+  assert.equal(restored.doNotAsk,true);
+  second.setDoNotAsk(false);
+  first.remember('two',['two-2']);
+  assert.equal(createImportLibrary({catalog,storage}).doNotAsk,false);
+});
+
+check('refresh reads current storage instead of a delayed event and reflects explicit deletion', () => {
+  const storage = memory();
+  const first = createImportLibrary({catalog,storage});
+  const second = createImportLibrary({catalog,storage});
+  second.remember('one',['one-1']);
+  const stale = storage.getItem(MUSIC_LIBRARY_KEY);
+  second.remember('one',['one-2']);
+  assert.equal(first.refreshFromStorage({newValue:stale}),true);
+  assert.deepEqual([...first.tracksFor('one')],['one-1','one-2']);
+  assert.equal(first.refreshFromStorage(),false);
+  storage.values.delete(MUSIC_LIBRARY_KEY);
+  assert.equal(first.refreshFromStorage(),true);
+  assert.deepEqual(first.records(),[]);
+  assert.equal(first.doNotAsk,false);
+});
+
+check('fresh merges retain hidden catalogue records and unknown tracks without displaying them', () => {
+  const storage = memory();
+  const library = createImportLibrary({catalog,storage});
+  const archived = {albumId:'archived',trackIds:['archive-1'],importedAt:20};
+  storage.values.set(MUSIC_LIBRARY_KEY,JSON.stringify({version:1,doNotAsk:true,albums:[archived,{albumId:'one',trackIds:['one-1','unknown-track'],importedAt:10}]}));
+  library.remember('two',['two-1']);
+  const saved = JSON.parse(storage.getItem(MUSIC_LIBRARY_KEY));
+  assert.deepEqual(saved.albums.find(row=>row.albumId==='archived'),archived);
+  assert.deepEqual(saved.albums.find(row=>row.albumId==='one').trackIds,['one-1','unknown-track']);
+  assert.deepEqual([...library.tracksFor('one')],['one-1']);
+  assert.equal(library.records().some(row=>row.albumId==='archived'),false);
+});
+
+check('a newer schema arriving after startup is never overwritten by imports or prompt choices', () => {
+  const storage = memory();
+  const library = createImportLibrary({catalog,storage});
+  const future = JSON.stringify({version:3,privateData:{keep:true}});
+  storage.values.set(MUSIC_LIBRARY_KEY,future);
+  library.remember('one',['one-1']);library.setDoNotAsk(true);
+  assert.equal(storage.getItem(MUSIC_LIBRARY_KEY),future);
+  assert.deepEqual([...library.tracksFor('one')],['one-1']);
+  assert.equal(library.doNotAsk,true);assert.equal(library.persistent,false);
+});
+
+check('failed local imports survive refresh and merge with another tab when writes recover', () => {
+  const storage = memory();let writable = false;
+  const unreliable = {...storage,setItem(key,value){if(!writable)throw Error('quota');storage.setItem(key,value);}};
+  const library = createImportLibrary({catalog,storage:unreliable});
+  library.remember('one',['one-1']);library.setDoNotAsk(true);
+  const other = createImportLibrary({catalog,storage});other.remember('one',['one-2']);other.remember('two',['two-1']);
+  library.refreshFromStorage();
+  assert.deepEqual([...library.tracksFor('one')],['one-1','one-2']);
+  assert.equal(library.doNotAsk,true);assert.equal(library.persistent,false);
+  writable = true;library.remember('one',['one-3']);
+  const restored = createImportLibrary({catalog,storage});
+  assert.deepEqual([...restored.tracksFor('one')],['one-1','one-2','one-3']);
+  assert.deepEqual([...restored.tracksFor('two')],['two-1']);assert.equal(restored.doNotAsk,true);
+  assert.equal(library.persistent,true);
+});
+
+check('unreadable or oversized records cannot be overwritten by a stale tab', () => {
+  const storage = memory();let readable = true;
+  const restricted = {...storage,getItem(key){if(!readable)throw Error('read denied');return storage.getItem(key);}};
+  const library = createImportLibrary({catalog,storage:restricted});
+  const future = JSON.stringify({version:2,keep:'unread'});
+  storage.values.set(MUSIC_LIBRARY_KEY,future);readable=false;
+  library.remember('one',['one-1']);assert.equal(storage.getItem(MUSIC_LIBRARY_KEY),future);
+  readable=true;const oversized=' '.repeat(2_000_001);storage.values.set(MUSIC_LIBRARY_KEY,oversized);
+  library.setDoNotAsk(true);assert.equal(storage.getItem(MUSIC_LIBRARY_KEY),oversized);
+  assert.equal(library.persistent,false);
+});
+
 console.log(`PASS all ${passed} import-library checks`);
